@@ -572,8 +572,6 @@
                 <li><a tabindex="-1" href="<?php echo base_url(); ?>administrator/master_klasifikasi_surat_masuk/m_klasifikasi">Master Klasifikasi</a></li>
                 <li><a tabindex="-1" href="<?php echo base_url(); ?>administrator/master_derajat/m_derajat">Master Derajat</a></li>
                 <li><a tabindex="-1" href="<?php echo base_url(); ?>administrator/master_tujuan/m_tujuan">Master Asal Surat</a></li>
-				<?php } else if($this->session->userdata('admin_tingkatan') == 1 and $this->session->userdata('admin_satuan') == 6){ ?><!-- ubah mei error -->
-					<li><a tabindex="-1" href="<?php echo base_url(); ?>administrator/master_arsip_surat/m_arsip_surat">Master Arsip Surat</a></li>
 				<?php } ?>
                 <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/surat_masuk">Surat Masuk</a></li>
                 <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/surat_keluar">Surat Keluar</a></li>

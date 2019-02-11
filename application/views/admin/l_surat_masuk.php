@@ -221,9 +221,11 @@ display: none;
 					<a target="_blank" href="<?php echo base_URL()?>admin/cetak_surat_masuk/<?php echo $b->id; ?>" class="btn btn-info btn-sm" title="Cetak"><i class="icon-print icon-white"> </i>Cetak</a>
 			<?php }else if($tingkatan==1 and isset($arrayDisp[$jabatan])){ // kadis mendisposisi
 					$kadisDisp = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = $b->id AND penerima_disposisi = $jabatan")->row();
-					if(($kadisDisp!=NULL and $kadisDisp->disposisi == 'yes') or (isset($arrDispJenis[$jabatan]) and $arrDispJenis[$jabatan]=="INFORMASI")){ ?>						
+					if(($kadisDisp!=NULL and $kadisDisp->status == 1) and isset($arrDispJenis[$jabatan]) and $arrDispJenis[$jabatan]=="INFORMASI"){?>
+						<a href="<?php echo base_URL()?>admin/surat_masuk/kadisp/<?=$b->id;?>" class="btn btn-warning btn-sm" title="Lihat"> Proses</a>
+					<?php }elseif(($kadisDisp!=NULL and $kadisDisp->disposisi == 'yes') or (isset($arrDispJenis[$jabatan]) and $arrDispJenis[$jabatan]=="INFORMASI")){
+					?>
 						<a href="<?php echo base_URL()?>admin/surat_masuk/kadisp/<?=$b->id;?>" class="btn btn-default btn-sm" title="Lihat"> Lihat</a>
-						<a href="#" class="btn btn-warning btn-sm"> Terkirim</a>
 						<?php
 						if($sm_waka_status=="Sudah Feedbak = Selesai"){ ?>
 						<a target="_blank" href="<?php echo base_URL()?>admin/cetak_surat_masuk/<?=$b->id;?>" class="btn btn-info btn-sm" title="Cetak">Cetak</a>
@@ -257,8 +259,8 @@ display: none;
 					<a href="#" class="btn btn-warning btn-sm"> Terkirim</a>
 					<a target="_blank" href="<?php echo base_URL()?>admin/cetak_surat_masuk/<?=$b->id;?>" class="btn btn-info btn-sm" title="Cetak">Cetak</a>
 				<?php }elseif($tingkatan==1){ ?>
-					<a target="_blank" href="<?php echo base_URL()?>admin/cetak_surat_masuk/<?=$b->id;?>" class="btn btn-info btn-sm" title="Cetak"><i class="icon-print icon-white"> </i>Cetak</a>
-					<button type="button" onclick="bacaKadis(<?= $b->id ?>,'kadisp')"  class="btn btn-warning btn-sm" title="Proses">Proses <?=$nil;?></button>
+					<button type="button" onclick="bacaKadis(<?= $b->id ?>,'kadisp')"  class="btn btn-warning btn-sm" title="Lihat">Lihat <?=$nil;?></button>
+					<a target="_blank" href="<?php echo base_URL()?>admin/cetak_surat_masuk/<?=$b->id;?>" class="btn btn-info btn-sm" title="Cetak">Cetak</a>
 				<?php }elseif($tingkatan==2){ ?>
 					<button onclick="bacasatuan(<?= $b->id ?>,'subdisp')" type="button" class="btn btn-success btn-sm" title="Terkirim">Lihat <?= $nil; ?></button>
 					<a target="_blank" href="<?php echo base_URL()?>admin/cetak_surat_masuk/<?=$b->id;?>" class="btn btn-info btn-sm" title="Cetak">Cetak</a>
