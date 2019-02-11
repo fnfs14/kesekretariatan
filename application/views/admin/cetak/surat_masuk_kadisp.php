@@ -48,7 +48,7 @@
 						<input disabled type="checkbox" name="" id="" class=""'. $checkedInfo .'> 
 					</td>
 					<td class="second">
-						<label style="font-size:11px !important;">'. $c->nama_subjabatan . $c->id . '</label>
+						<label style="font-size:11px !important;">'. $c->nama_subjabatan . '</label>
 					</td>';
 					if($count_alamat_aksi==3){
 						echo "</tr>";

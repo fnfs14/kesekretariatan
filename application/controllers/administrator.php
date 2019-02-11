@@ -177,37 +177,35 @@ class Administrator extends CI_Controller {
         $time = date('H:i:s');
         $date = date('Y-m-d');
         $pengirim = $this->session->userdata('admin_jabatan');
-        // $this->db->query("INSERT INTO notadinas.feedback_nota_dinas (id_nota_dinas,pengirim,pesan_feedback,created_at,waktu,baca,penerima) VALUES ($id,$pengirim,'$pesan','$date','$time','1','$pengirim')");
-        // $setum = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE satuan = '6' AND tingkatan = '1'")->result();
-        // foreach ($setum as $key2) {
-			$key2 = 2;
-            $this->db->query("INSERT INTO notadinas.feedback_nota_dinas (id_nota_dinas,pengirim,pesan_feedback,created_at,waktu,penerima) VALUES ($id,$pengirim,'$pesan','$date','$time','$key2')");
-        // }
-        $nota = $this->db->query("SELECT * FROM notadinas.nota_dinas WHERE id = '$id'")->row();
-        $tujuan = $nota->kepada;
-        $ygbuat = $this->db->query("SELECT * FROM notadinas.master_user WHERE id = '".$nota->create_by."'")->row();
-        $ygbuat2 = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE id = '".$ygbuat->jabatan."'")->row();
-        if($ygbuat2->satuan==""){
-            $this->db->query("INSERT INTO notadinas.feedback_nota_dinas (id_nota_dinas,pengirim,pesan_feedback,created_at,waktu,penerima) VALUES ($id,$pengirim,'$pesan','$date','$time','".$ygbuat2->id."')");
-        }else{
-            $ygbuat3 = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE satuan = '".$ygbuat2->satuan."' AND tingkatan = '1'")->result();
-            foreach ($ygbuat3 as $key1) {   
-                if($key1->id){    
-                    if($key1->id != $pengirim){
-                        $this->db->query("INSERT INTO notadinas.feedback_nota_dinas (id_nota_dinas,pengirim,pesan_feedback,created_at,waktu,penerima) VALUES ($id,$pengirim,'$pesan','$date','$time','".$key1->id."')");
-                    }
-                }
-            }
-        }
-        if($tujuan != $pengirim){
-            $this->db->query("INSERT INTO notadinas.feedback_nota_dinas (id_nota_dinas,pengirim,pesan_feedback,created_at,waktu,penerima) VALUES ($id,$pengirim,'$pesan','$date','$time','$tujuan')");    
-        }
-        $tmbsn = $this->db->query("SELECT * FROM notadinas.tembusan_nota_dinas WHERE id_notadinas = '".$id."'")->result();
-        foreach ($tmbsn as $key) {
-            if($key->id_jabatan != $pengirim){
-                $this->db->query("INSERT INTO notadinas.feedback_nota_dinas (id_nota_dinas,pengirim,pesan_feedback,created_at,waktu,penerima) VALUES ($id,$pengirim,'$pesan','$date','$time','".$key->id_jabatan."')");
-            }
-         }
+		$penerima = [];
+		$tembusan = $this->db->query("
+			SELECT id_jabatan as id
+			FROM notadinas.tembusan_nota_dinas
+			WHERE
+				id_notadinas = $id
+				AND id_jabatan != $pengirim
+			UNION
+			SELECT kepada as id
+			FROM notadinas.nota_dinas
+			WHERE
+				id = $id
+				AND kepada != $pengirim
+			UNION
+			SELECT mu.jabatan as id
+			FROM notadinas.nota_dinas as nd
+			INNER JOIN notadinas.master_user as mu
+				ON nd.create_by = mu.id
+			WHERE
+				nd.id = $id
+				AND mu.jabatan != $pengirim
+		")->result();
+		foreach($tembusan as $t){
+			$penerima[] = $t->id;
+		}
+		$this->db->query("INSERT INTO notadinas.feedback_nota_dinas (id_nota_dinas,pengirim,pesan_feedback,created_at,waktu,penerima,baca) VALUES ($id,$pengirim,'$pesan','$date','$time',$pengirim,1)");
+		foreach($penerima as $p){
+			$this->db->query("INSERT INTO notadinas.feedback_nota_dinas (id_nota_dinas,pengirim,pesan_feedback,created_at,waktu,penerima) VALUES ($id,$pengirim,'$pesan','$date','$time','".$p."')");
+		}
     }
 
     public function feedbacksuratkel()

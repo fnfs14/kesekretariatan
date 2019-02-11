@@ -734,30 +734,29 @@ if ($mode == "edt" || $mode == "act_edt") {
                 })();
 
                 //Trigger keyup untuk id no_surat
-                $(document).on('keyup', '#no_surat', function() {
-                   delay(function(){
-                    //Get variable
-                    var id = $('#no_surat').val();
-                    var idp = <?php echo ($idp != "") ? $idp : "0"; ?>;
-                      $.ajax({
-                        method: 'post',
-                        data: {id:id,id_surat:idp,table:'surat_masuk'},
-                        url:"<?php echo base_url(); ?>admin/validasi_id",
-                        success: function(data) {
+                // $(document).on('keyup', '#no_surat', function() {
+                   // delay(function(){
+                    // var id = $('#no_surat').val();
+                    // var idp = <?php echo ($idp != "") ? $idp : "0"; ?>;
+                      // $.ajax({
+                        // method: 'post',
+                        // data: {id:id,id_surat:idp,table:'surat_masuk'},
+                        // url:"<?php echo base_url(); ?>admin/validasi_id",
+                        // success: function(data) {
 
-                            if(data>0){
-                                $('#warning_nosu').css('display','block');
-                            }else{
-                                $('#warning_nosu').css('display','none');
-                            }
-                        },
-                        error: function(error){
-                            console.log(error);
-                        }
+                            // if(data>0){
+                                // $('#warning_nosu').css('display','block');
+                            // }else{
+                                // $('#warning_nosu').css('display','none');
+                            // }
+                        // },
+                        // error: function(error){
+                            // console.log(error);
+                        // }
 
-                        });
-                    }, 1000 );
-                });
+                        // });
+                    // }, 1000 );
+                // });
                 
                 //Ketika webpage diload, langsung melakukan pengecekan
                   $(window).load(function(){
@@ -783,9 +782,7 @@ if ($mode == "edt" || $mode == "act_edt") {
 
                                 if($("select[name='jenis_surat']").val()==""){
 									alert("Pilih jenis surat dulu.");
-								}else if ($('#warning_nosu').is(':visible')) {
-                                    alert("No surat sudah ada.");
-                                }else{
+								}else{
     								if($("input[name='perihal']").val()==""){
     									alert("Harap isi perihal");
     								}else if ($('select[name="kepada"]').val()=="" || $('select[name="kepada"]').val()=="- Pilih -") {

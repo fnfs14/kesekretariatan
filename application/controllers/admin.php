@@ -2784,7 +2784,26 @@ ORDER BY updated_at DESC")->result();
         }
         $aksi = $this->uri->segment(3);
         $idu = $this->uri->segment(4);
-        if ($aksi == "add") {
+        if ($aksi == "alternateSave") {
+			$cek_user_exist = $this->db->query("SELECT nama_kegiatan FROM notadinas.kegiatan_dinas WHERE nama_kegiatan = '$nmk'")->num_rows();
+			$data = "";
+            if ($cek_user_exist > 0) {
+				$data = "exist";
+            }else if($nmk == ""){
+                $data = "null";
+            }else {
+				$jid = $this->db->query("SELECT MAX(id_kegiatan) AS qwe FROM notadinas.kegiatan_dinas")->row();
+                $jids = $jid->qwe + 1;
+				$this->db->query("INSERT INTO notadinas.kegiatan_dinas VALUES ('".$jids."','" . $nmk . "')");
+				$query = $this->db->query("SELECT * FROM notadinas.kegiatan_dinas ORDER BY id_kegiatan DESC")->result();
+				$data .= '<option value="" style="display: none;">- Pilih Kegiatan -</option>';
+				foreach($query as $a){
+					$data .= "<option value='$a->id_kegiatan'>$a->nama_kegiatan</option>";
+				}
+            }
+			echo $data;
+			die();
+        }else if ($aksi == "add") {
             $a['page'] = "f_master_kegiatan";
         }else if ($aksi == "cari") {
             $a['data'] = $this->db->query("SELECT * FROM notadinas.kegiatan_dinas WHERE nama_kegiatan LIKE '%$cari%' ORDER BY id_kegiatan DESC")->result();

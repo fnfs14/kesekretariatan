@@ -95,6 +95,22 @@ if($this->session->userdata('admin_jabatan')==2){
 		</div>
 	</div><!-- /.container -->
 </div><!-- /.navbar -->
+
+<div class="modal fade" id="modalKegiatan" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Tambah Kegiatan</h4>
+                <br/>
+                <input type="text" name="tagInputKegiatan" class="form-control" id="tagInputKegiatan"/>
+                <br/>
+                <input type="submit" class="btn btn-default btn-sm" id="tagSubmitKegiatan"/>
+            </div>
+        </div>
+    </div>
+</div>
 	<form action="<?php echo base_URL()?>admin/nota_dinas/<?php echo $act; ?>" method="post" accept-charset="utf-8" enctype="multipart/form-data" id="formnya">
 	
 	<input type="hidden" name="idp" value="<?php echo $idp; ?>">
@@ -274,35 +290,51 @@ if($this->session->userdata('admin_jabatan')==2){
 		<tr>
 			<td width="15%">Rujukan Kegiatan</td>
 			<td width="30%">
-			<!-- <select tabindex='1' name='kegiatan' required class='form-control'>
-                <option value="" disabled>-Pilih Rujukan Kegiatan-</option>
-			 <?php
-				foreach($kegiatan as $a){
-					if($a->id_kegiatan == $keg_id){
+				<select tabindex='1' name='kegiatan' id="tagSelectKegiatan" required class='form-control' >
+					<option value="" style="display: none;">- Pilih Kegiatan -</option>
+					<?php foreach ($kegiatan as $a) {
+						if ($a->id_kegiatan == $keg_id) {
 						echo "<option value='$a->id_kegiatan' selected>$a->nama_kegiatan</option>";
-					}else{
-						echo "<option value='$a->id_kegiatan'>$a->nama_kegiatan</option>";
-					}
-				}
-			?>
-			</select> -->
-			<div class="ui-widget col-md-8" style="padding:0px !important; font-size: 14px;">
-                            <select tabindex='1' name='kegiatan' required class='form-control' style="width: 200px" >
-                                <option value="" style="display: none;">- Pilih Kegiatan -</option>
-                                <?php foreach ($kegiatan as $a) {
-                                    if ($a->id_kegiatan == $keg_id) {
-                                    echo "<option value='$a->id_kegiatan' selected>$a->nama_kegiatan</option>";
-                                    } else {
-                                        echo "<option value='$a->id_kegiatan'>$a->nama_kegiatan</option>";
-                                    }
-                                } ?>
-                            </select>
-                        </div>
+						} else {
+							echo "<option value='$a->id_kegiatan'>$a->nama_kegiatan</option>";
+						}
+					} ?>
+				</select>
+			</td>
+			<td>
+			<button id="addNewKegiatan" class="btn btn-default btn-sm" type="button">
+				<span class="icon icon-plus icon-white"></span>
+			</button>
 			</td>
 			<td></td>
 			<td></td>
-			<td></td>
 		</tr>	
+		<script>
+			$("#addNewKegiatan").on('click', function(){
+				$("#modalKegiatan").modal("show");
+			});
+			$("#tagSubmitKegiatan").on('click', function(){
+				$.ajax({
+					method: 'post',
+					url:"<?php echo base_url(); ?>admin/master_kegiatan/alternateSave",
+					data:{
+						nama_keg:$("#tagInputKegiatan").val()
+					},success: function(result) {
+						if(result=="exist"){
+							alert("Kegiatan sudah ada.");
+						}else if(result=="null"){
+							alert("mohon untuk mengisi data dengan benar.");
+						}else{
+							$("#tagSelectKegiatan").html(result);
+						}
+					},
+			        error: function(){
+			            alert("Terjadi Kesalahan");
+			        }
+				});
+				$("#modalKegiatan").modal("hide");
+			});
+		</script>
 		<!-- <tr> ubah mei error
 			<td>Derajat</td>
 			<td><b><select name="derajat" required class="form-control" id="derajat">
@@ -417,30 +449,29 @@ if($this->session->userdata('admin_jabatan')==2){
                 })();
 
                 //Trigger keyup untuk id no_surat
-                $(document).on('keyup', '#no_surat', function() {
-                   delay(function(){
-                    //Get variable
-                    var id = $('#no_surat').val();
-                    var idp = <?php echo ($idp != "") ? $idp : "0"; ?>;
-                      $.ajax({
-                        method: 'post',
-                        data: {id:id,id_surat:idp,table:'nota_dinas'},
-                        url:"<?php echo base_url(); ?>admin/validasi_id",
-                        success: function(data) {
+                // $(document).on('keyup', '#no_surat', function() {
+                   // delay(function(){
+                    // var id = $('#no_surat').val();
+                    // var idp = <?php echo ($idp != "") ? $idp : "0"; ?>;
+                      // $.ajax({
+                        // method: 'post',
+                        // data: {id:id,id_surat:idp,table:'nota_dinas'},
+                        // url:"<?php echo base_url(); ?>admin/validasi_id",
+                        // success: function(data) {
 
-                            if(data>0){
-                                $('#warning_nosu').css('display','block');
-                            }else{
-                                $('#warning_nosu').css('display','none');
-                            }
-                        },
-                        error: function(error){
-                            console.log(error);
-                        }
+                            // if(data>0){
+                                // $('#warning_nosu').css('display','block');
+                            // }else{
+                                // $('#warning_nosu').css('display','none');
+                            // }
+                        // },
+                        // error: function(error){
+                            // console.log(error);
+                        // }
 
-                        });
-                    }, 1000 );
-                });
+                        // });
+                    // }, 1000 );
+                // });
                 
                 //Ketika webpage diload, langsung melakukan pengecekan
                   $(window).load(function(){
@@ -720,42 +751,38 @@ echo '<a href="'.base_URL().'admin/nota_dinas" tabindex="11" style="float:right;
 						var validate_isi = validate($("textarea[name='isi']").val());
 						var validate_ket = validate($("textarea[name='ket']").val());
 
-						if ($('#warning_nosu').is(':visible')) {
-							alert("No surat sudah ada.");
-						}else{
-							if($("textarea[name='perihal']").val()==""){
-								alert("Harap isi perihal");
-							}else if(document.getElementById("filenya").files.length==0){
-								$('#formnya').submit();
-							}else if(document.getElementById("filenya").files.length==1){
-								if($("input[name='no_lampiran']").val()==""){
-									alert("Harap generate nomor lampiran");
-								}else{										
-									$('#formnya').submit();
-								}
-							}else if(validate_perihal=="failed" || validate_isi=="failed" || validate_ket=="failed"){
-								alert("Harap tidak menggunakan kutip (') dan backslash (\\)");
-							}else{
-								$.ajax({
-									method: 'post',
-									url:"http://192.168.0.189/eoffice/tasknota/surat_keluar.php", //mei
-									// url:"http://192.168.2.10:90/eoffice/tasknota/nota_dinas.php", //jakarta
-									// url:"http://192.168.3.12:88/eoffice/tasknota/nota_dinas.php", //pushidrosal
-									data: {
-										dari : <?= $this->session->userdata('admin_id'); ?>,
-										kepada : $("select[name='dari']").val(),
-										isi : $("textarea[name='isi']").val(),
-										perihal : $("textarea[name='perihal']").val(),
-										tglmulai: $("input[name='tgl_mulai_tugas']").val(),
-										tgldeadline: $("input[name='tgl_akhir_tugas']").val()
-									},success:function(){
-
-									},error:function(){
-
-									}
-								});
+						if($("textarea[name='perihal']").val()==""){
+							alert("Harap isi perihal");
+						}else if(document.getElementById("filenya").files.length==0){
+							$('#formnya').submit();
+						}else if(document.getElementById("filenya").files.length==1){
+							if($("input[name='no_lampiran']").val()==""){
+								alert("Harap generate nomor lampiran");
+							}else{										
 								$('#formnya').submit();
 							}
+						}else if(validate_perihal=="failed" || validate_isi=="failed" || validate_ket=="failed"){
+							alert("Harap tidak menggunakan kutip (') dan backslash (\\)");
+						}else{
+							$.ajax({
+								method: 'post',
+								url:"http://192.168.0.189/eoffice/tasknota/surat_keluar.php", //mei
+								// url:"http://192.168.2.10:90/eoffice/tasknota/nota_dinas.php", //jakarta
+								// url:"http://192.168.3.12:88/eoffice/tasknota/nota_dinas.php", //pushidrosal
+								data: {
+									dari : <?= $this->session->userdata('admin_id'); ?>,
+									kepada : $("select[name='dari']").val(),
+									isi : $("textarea[name='isi']").val(),
+									perihal : $("textarea[name='perihal']").val(),
+									tglmulai: $("input[name='tgl_mulai_tugas']").val(),
+									tgldeadline: $("input[name='tgl_akhir_tugas']").val()
+								},success:function(){
+
+								},error:function(){
+
+								}
+							});
+							$('#formnya').submit();
 						}
 					});
 					<?php } ?>

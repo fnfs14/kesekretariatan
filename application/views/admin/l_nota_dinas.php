@@ -16,8 +16,12 @@
 		<div class="navbar-collapse collapse navbar-inverse-collapse" style="margin-right: -20px">
 
 			<ul class="nav navbar-nav">
+				<?php
+				if($this->session->userdata('admin_jabatan')!=2){
+				?>
 				<li><a href="<?php echo base_URL(); ?>admin/nota_dinas/add" class="btn-info"><i class="icon-plus-sign icon-white"> </i> Tambah Data</a></li>
 				<?php
+				}
 				if($this->session->userdata('admin_jabatan') == 1){ ?>
 				<li><a href="<?php echo base_URL(); ?>admin/nota_dinas/getDetailSendiri" class="btn-info"><i class=""> </i> List Permohonan Kapus</a></li>
 				<?php } elseif($this->session->userdata('admin_jabatan') == 28) { ?>
