@@ -188,7 +188,7 @@
         </table> -->
         <table id="second">
             <tr>
-                <td style="width: 65%;"><!-- ubah mei surmas4 -->
+                <td style="width: 35%;"><!-- ubah mei surmas4 -->
                     <table style="font-size: 13px !important;"><!-- ubah mei surmas4 -->
                         <tr>
                             <!-- <td colspan="2">Detil Surat</td> -->
@@ -236,8 +236,9 @@
                             <td>:&nbsp; <b><a style="font-size: 11px;" href="</?= site_url(); ?>upload/surat_masuk/</?= $data->file_attachment; ?>"></?= //$data->file_attachment; ?></a></b></td>
                         </tr> -->
                     </table>                    
-                </td>                
-                <td>
+                </td>              
+				<td></td>
+                <td style="width: 35%;">
                     <table style="font-size: 13px !important; border-collapse: collapse;" border="1px"><!-- ubah mei surmas4 -->
                         <tr>
                             <td colspan="2" style="text-align: center; font-size: 11px !important;">

@@ -47,11 +47,11 @@ if ($mode == "edt" || $mode == "act_edt") {
     $kondisp = 0;//ubah mei surmas11
 
 } else if ($mode == "disp") {
-    if ($this->session->userdata('admin_jabatan') == 1 and $datpil->kepada == 28) {
-        $act = "viewonly";
-    } else {
+    // if ($this->session->userdata('admin_jabatan') == 1 and $datpil->kepada == 28) {
+        // $act = "viewonly";
+    // } else {
         $act = "view";
-    }
+    // }
     $idp = $datpil->id;
     $no_setum = $datpil->no_setum;
     $tgl_setum = $datpil->tgl_setum;
@@ -833,7 +833,13 @@ if ($mode == "edt" || $mode == "act_edt") {
 
 
 
-<?php if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this->session->userdata('admin_jabatan') == "1" && $act == "view" || $this->session->userdata('admin_tingkatan') == "1" && $act != "act_add" && $act != "act_edt" || $act == "kadisp" || $act == "subdisp") { ?>
+<?php 
+$checkJabatan = NULL;
+if($mode!="add"){
+	$checkJabatan = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE id = $kepada")->row();
+}
+                           
+if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this->session->userdata('admin_jabatan') == "1" && $act == "view" || $this->session->userdata('admin_tingkatan') == "1" && $act != "act_add" && $act != "act_edt" || $act == "kadisp" || $act == "subdisp") { ?>
 
     <div class="row-fluid well" style="overflow: hidden">
         <div class="navbar navbar-inverse">
@@ -860,8 +866,7 @@ if ($mode == "edt" || $mode == "act_edt") {
 
                        <?php
                            $no = 2;
-						   $checkJabatan = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE id = $kepada")->row();
-                           foreach ($jabatan as $key => $c) {
+						   foreach ($jabatan as $key => $c) {
                             if($c->id != 0 && $c->id != 1){//ubah mei surmas2
                             
                             $checked = "";
@@ -897,7 +902,7 @@ if ($mode == "edt" || $mode == "act_edt") {
 
                             }
 						   $checkJabatanZ = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE id = $c->id")->row();
-							if($checkJabatanZ->tingkatan==2 and $checkJabatanZ->tingkatan != $checkJabatan->tingkatan){
+							if(($checkJabatanZ->tingkatan==2 and $checkJabatanZ->tingkatan != $checkJabatan->tingkatan) and $checkJabatan->id!=1 and $checkJabatan->id!=28){
 								$checked = "";
 								$checkeds = "";
 							}
@@ -956,7 +961,7 @@ if ($mode == "edt" || $mode == "act_edt") {
                     foreach ($aksi as $c){
 
                         $checkedzx = "";
-                        $param = array();
+                        $param = "";
                         $table_aksi = $this->db->query('SELECT * FROM notadinas.aksi_disposisi_surat_masuk WHERE id_disposisi_surat_masuk = '.$idp)->result();
 
                         foreach ($table_aksi as $key => $svs) {
@@ -1137,9 +1142,15 @@ if ($mode == "edt" || $mode == "act_edt") {
              </div>
         </div>
      </div>
- <?php } ?>
-
-      <?php if(($act != "kadisp" && $act != "subdisp") or $checkJabatan->tingkatan==2){ ?><!--ubah surat masuk mei-->
+ <?php }
+ if($checkJabatan!=NULL){
+	$dispCol = "penerima_disposisi";
+	if($checkJabatan->tingkatan==2){
+		$dispCol = "penerima_disposisi_satuan";								
+	}
+	$checkDisp = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = $idp AND $dispCol = " . $this->session->userdata('admin_jabatan'))->row();
+ }
+ if(($act != "kadisp" && $act != "subdisp") or ($checkJabatan!=NULL and $checkJabatan->tingkatan==2) or ($checkJabatan!=NULL and $checkDisp!=NULL and $checkDisp->jenis=='INFORMASI') or ($checkJabatan!=NULL and $checkJabatan->id!=1 and $checkJabatan->id!=28)){ ?><!--ubah surat masuk mei-->
         <?php // }else if(isset($InfoOrAksi) and $InfoOrAksi->jenis=="INFORMASI"){ ?>
       <!-- <a class="btn btn-success btn-sm" tabindex="4" id="disposisikan_satuan">Kembali</a> -->
         <?php }  else { ?><!--ubah surat masuk mei-->

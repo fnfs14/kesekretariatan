@@ -1,3 +1,7 @@
+<div class='page-break'></div>
+<br/>
+<br/>
+<br/>
 <table id="first">
 	<tr>
 		<td>Disposisi Kasubdis</td>
@@ -35,7 +39,7 @@
 						if($kadsipAction->jenis == 'AKSI'){
 							$checkedAksi = "checked";
 						}else{
-							$kadsipAction = "checked";
+							$checkedInfo = "checked";
 						}
 					}
 					echo '
@@ -44,7 +48,7 @@
 						<input disabled type="checkbox" name="" id="" class=""'. $checkedInfo .'> 
 					</td>
 					<td class="second">
-						<label style="font-size:11px !important;">'. $c->nama_subjabatan .'</label>
+						<label style="font-size:11px !important;">'. $c->nama_subjabatan . $c->id . '</label>
 					</td>';
 					if($count_alamat_aksi==3){
 						echo "</tr>";

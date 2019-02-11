@@ -746,6 +746,22 @@ ORDER BY updated_at DESC")->result();
 			$this->session->userdata('admin_jabatan') != 2 and
 			$this->session->userdata('admin_jabatan') != 28
 		){		
+			$idJabatan = $this->session->userdata('admin_jabatan');
+			if($this->session->userdata('admin_tingkatan')==2){
+				$data = $this->db->query("
+				SELECT mj.id AS id
+				FROM notadinas.disposisi_surat_masuk AS dsm
+				INNER JOIN notadinas.master_jabatan AS mj
+					ON mj.id = dsm.penerima_disposisi
+				WHERE
+					dsm.id_surat_masuk = $idb
+					AND
+					mj.tingkatan = 1
+					AND
+					mj.satuan = ". $this->session->userdata('admin_satuan')
+				)->row();
+				$idJabatan = $data->id;
+			}
 			$kadisp['aksinya'] = $disp['aksi'];
 			$kadisp['alamat_aksi_sub'] = $this->db->query("
 				SELECT 
@@ -759,7 +775,7 @@ ORDER BY updated_at DESC")->result();
 				INNER JOIN notadinas.master_jabatan as c
 					ON b.id_jabatan = c.id
 				WHERE
-					b.id_jabatan = '". $this->session->userdata('admin_jabatan') ."'
+					b.id_jabatan = '". $idJabatan ."'
 					AND
 					a.tingkatan = 2
 				ORDER BY
@@ -1063,18 +1079,72 @@ ORDER BY updated_at DESC")->result();
             $a['aksi'] = $this->db->query("SELECT * FROM notadinas.master_aksi ORDER BY urutan ASC")->result();
             $a['query1'] = $query = $this->eoffice->query("SELECT * FROM fo_objects WHERE object_type_id = 1 AND trashed_on = '0000-00-00 00:00:00' AND trashed_by_id = 0")->result();
             $a['query2'] = $query = $this->eoffice->query("SELECT * FROM fo_objects WHERE object_type_id = 5 AND trashed_on = '0000-00-00 00:00:00' AND trashed_by_id = 0")->result();
+			$a['diteruskan_kepada'] = $this->getSelectedJabatan();
 
             $a['page'] = "f_edt_surat_masuk";
-        }  else if ($mau_ke == "act_edited") {///ubah surat masuk mei
+        }  else if ($mau_ke == "act_edited") {
+			$this->db->query("DELETE FROM notadinas.aksi_disposisi_surat_masuk WHERE id_disposisi_surat_masuk = $idp;");
+			$this->db->query("DELETE FROM notadinas.aksi_disposisi_surat_masuk_satuan WHERE id_surat_masuk = $idp;");
+			$this->db->query("DELETE FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = $idp;");
+			$this->db->query("DELETE FROM notadinas.feedback_surat_masuk WHERE id_surat_masuk = $idp;");
+			$this->db->query("DELETE FROM notadinas.feedback_surat_masuk_satuan WHERE id_surat_masuk = $idp;");
+			$this->db->query("DELETE FROM notadinas.log_proses_surat_masuk WHERE id_suratmasuk = $idp;");
+			$this->db->query("DELETE FROM notadinas.surat_masuk_waka WHERE surat_masuk = $idp;");
+			$this->db->query("DELETE FROM notadinas.surat_masuk WHERE id = $idp;");
+			$_tingkatan = $this->db->query('SELECT tingkatan,satuan FROM notadinas.master_jabatan WHERE id = ' . $kepada)->row();
+			$_status_surat_masuk = 1;
+			$_opened = 1;
+			if($_tingkatan->tingkatan==1){
+				$_status_surat_masuk = 30;
+				$_opened = 30;
+			}else if($_tingkatan->tingkatan==2){
+				$_status_surat_masuk = 40;
+				$_opened = 40;
+			}
+			$tasktask  = addslashes($this->input->post('tknya'));
             if ($this->upload->do_upload('file_attachment')) {
                 $up_data = $this->upload->data();
 
-                $this->db->query("UPDATE notadinas.surat_masuk SET tgl_surat = '$tgl_surat', instansi = '$instansi', no_surat = '$no_surat', perihal = '$perihal', keterangan = '$keterangan', kepada = '$kepada', no_setum = '$no_setum', tgl_setum = '$tgl_setum2', klasifikasi = '$klasifikasi', file_attachment = '".$up_data['file_name']."', id_ruang = '$ruang', id_rak = '$rak', id_box = '$box', baris = '$baris', id_jenis_surat_masuk = '$jenis', updated_at = '$upd_date'  WHERE id = '$idp'");//ubah mei surmas8
-            } else {
-                $this->db->query("UPDATE notadinas.surat_masuk SET tgl_surat = '$tgl_surat', instansi = '$instansi', no_surat = '$no_surat', perihal = '$perihal', keterangan = '$keterangan', kepada = '$kepada', no_setum = '$no_setum', tgl_setum = '$tgl_setum2', klasifikasi = '$klasifikasi', id_ruang = '$ruang', id_rak = '$rak', id_box = '$box', baris = '$baris', id_jenis_surat_masuk = '$jenis', updated_at = '$upd_date' WHERE id = '$idp'");
-            }
+                $this->db->query("INSERT INTO notadinas.surat_masuk VALUES (DEFAULT, '$tgl_surat', '$instansi', '$no_surat', '$perihal', '$keterangan', '$kepada', '$no_setum', '$tgl_setum2', '$klasifikasi', '$derajat', '$_status_surat_masuk', '" . $this->session->userdata('admin_id') . "' ,'" . $up_data['file_name'] . "','$_opened','$ruang','$rak','$box','$baris','$jenis','0','0','0')");//ubah surat masuk mei
 
-            $this->session->set_flashdata("k", "<div class=\"alert alert-success\" id=\"alert\">Data has been updated. " . $this->upload->display_errors() . "</div>");
+            } else {
+                $this->db->query("INSERT INTO notadinas.surat_masuk VALUES (DEFAULT, '$tgl_surat', '$instansi', '$no_surat', '$perihal', '$keterangan', '$kepada', '$no_setum', '$tgl_setum2', '$klasifikasi', '$derajat', '$_status_surat_masuk', '" . $this->session->userdata('admin_id') . "' , 'Tidak ada Dokumen','$_opened','$ruang','$rak','$box','$baris','$jenis','0','0','0')");//ubah mei bahasa //ubah surat masuk mei
+            }
+			$baruinputtadi = $this->db->query('SELECT max(id) as greed FROM notadinas.surat_masuk ')->row();
+			$maxsm = $baruinputtadi->greed;
+			$this->db->query("UPDATE notadinas.surat_masuk SET id_taks = '$tasktask' WHERE id = '$maxsm'");
+           
+            date_default_timezone_set('Asia/Jakarta');
+			$_waktu = date('H:i:s');
+            $id = $this->db->query("SELECT MAX(id) AS qwe FROM notadinas.surat_masuk")->row();
+			$this->db->query("UPDATE notadinas.surat_masuk SET updated_at = '$upd_date' WHERE id = '$id->qwe'");
+            $this->db->query("INSERT INTO notadinas.log_proses_surat_masuk VALUES (DEFAULT,$id->qwe,NOW(),'" . $this->session->userdata('admin_id') . "','$kepada','$keterangan','1','" . $this->session->userdata('admin_id') . "','$_waktu')");
+            $_tmp_log_id = $this->db->query("SELECT MAX(id) AS qwe FROM notadinas.log_proses_surat_masuk")->row();
+            $this->session->set_flashdata("k", "<div class=\"alert alert-success\" id=\"alert\">Data sudah ditambahkan. " . $this->upload->display_errors() . "</div>");
+			$txt_jabatan_firebase = "";
+			if($_tingkatan->tingkatan==1 or $_tingkatan->tingkatan==2){
+				$this->db->query("INSERT INTO notadinas.log_proses_surat_masuk VALUES (DEFAULT,$id->qwe,NOW(),'" . $this->session->userdata('admin_id') . "','1','$keterangan','2','" . $this->session->userdata('admin_id') . "','$_waktu')");
+				$this->db->query("INSERT INTO notadinas.log_proses_surat_masuk VALUES (DEFAULT,$id->qwe,NOW(),'" . $this->session->userdata('admin_id') . "','28','$keterangan','2','" . $this->session->userdata('admin_id') . "','$_waktu')");
+				$this->db->query("INSERT INTO notadinas.disposisi_surat_masuk VALUES (DEFAULT,'1','$_tmp_log_id->qwe','INFORMASI','1','0','$keterangan',$id->qwe)");
+				$this->db->query("INSERT INTO notadinas.disposisi_surat_masuk VALUES (DEFAULT,'28','$_tmp_log_id->qwe','AKSI','1','0','$keterangan',$id->qwe)");
+				$this->db->query("INSERT INTO notadinas.aksi_disposisi_surat_masuk VALUES(DEFAULT,$id->qwe,2,'KOORDINASIKAN')");
+				$txt_jabatan_firebase .= "28,1,";
+			}
+			if($_tingkatan->tingkatan==1){
+				$this->db->query("INSERT INTO notadinas.disposisi_surat_masuk VALUES (DEFAULT,'$kepada','$_tmp_log_id->qwe','AKSI','1','0','$keterangan',$id->qwe)");
+				$txt_jabatan_firebase .= "$kepada,";
+			}else if($_tingkatan->tingkatan==2){
+				$this->db->query("INSERT INTO notadinas.disposisi_surat_masuk VALUES (DEFAULT,NULL,'$_tmp_log_id->qwe','AKSI','2','0','$keterangan',$id->qwe,NULL,'$kepada')");
+				$txt_jabatan_firebase .= "$kepada,";
+				$qKadis = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE satuan = $_tingkatan->satuan AND tingkatan = 1")->result();
+				foreach($qKadis as $qK){
+					$this->db->query("INSERT INTO notadinas.disposisi_surat_masuk VALUES (DEFAULT,'$qK->id','$_tmp_log_id->qwe','INFORMASI','1','0','$keterangan',$id->qwe)");
+					$txt_jabatan_firebase .= "$qK->id,";
+				}
+			}
+			if($_tingkatan->tingkatan==1 or $_tingkatan->tingkatan==2){
+				$this->pushFirebase($txt_jabatan_firebase);
+			}
             redirect('index.php/admin/surat_masuk');
         } else if ($mau_ke == "tambah_tugas") {
             $rk = $_GET['r'];
@@ -1817,12 +1887,14 @@ ORDER BY updated_at DESC")->result();
 					WHERE (kepada = " .$this->session->userdata('admin_jabatan');
 				if($this->session->userdata('admin_jabatan')==1){
 					$sqlZ .= " or kepada = 28";
+				}elseif($this->session->userdata('admin_jabatan')==28){
+					$sqlZ .= " or kepada = 1";
 				}
 				$sqlZ .= " $_wherein ) AND status_surat_masuk!=30 AND status_surat_masuk!=40";
 			}
 			$sqlZ .= " ORDER BY notadinas.surat_masuk.id DESC";
-			// $this->dd($sqlZ);
 			$a['data'] = $this->db->query($sqlZ)->result();
+			// $this->dd($a['data']);
             $a['jenis_surat'] = $this->db->query('SELECT * FROM notadinas.master_surat_masuk')->result();
             $a['page'] = "l_surat_masuk";
             // $a['page'] = "l_surat_masuk - Copy";
@@ -2942,6 +3014,7 @@ ORDER BY updated_at DESC")->result();
 		$id_jenissurat = $_GET['abcd'];
 		 $a['listtugasnya'] = $this->db->query("SELECT a.nama_task, a.id_task FROM notadinas.master_task as a, notadinas.master_ruangkrj as b  
 		 WHERE a.id_etask = b.id_ruang_kerja and b.id_jenissurat = $id_jenissurat")->result();
+		 $a['selected'] = (isset($_GET['selected']))?$_GET['selected']:0;
 
         $this->load->view('admin/listtugas', $a);
 	}
