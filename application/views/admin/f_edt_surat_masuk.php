@@ -80,7 +80,7 @@ $mode = $this->uri->segment(3);
 <ol class="breadcrumb breadcrumb-arrow">
     <li><a href="#"><i class="fa fa-home"></i></a></li>
     <li><a href="#"><i class="fa fa-envelope"></i> Surat Masuk</a></li>
-    <li class="active"><span>Tambah Surat</span></li>
+    <li class="active"><span>Edit Surat</span></li>
 </ol>
 <!-- End Breadcrumb -->
 <div class="navbar navbar-inverse">
@@ -426,23 +426,28 @@ $mode = $this->uri->segment(3);
             <?php } ?>
             <script>
                 $("#generate_no").click(function () {
-                    // alert(document.getElementById("filenya").files[0].name);
-                    // $.ajax({
-                        // method: 'post',
-                        // url: "<?php echo base_url(); ?>admin/generate_filename?q=2",
-                        // success: function (result) {
-                            // var a = new Date();
-                            // $("#no_lampiran").attr("value", "SM-" + result + "-" + a.getFullYear());
-                            // $("#cetak_no_lampiran").attr("href", "<?php echo base_URL(); ?>admin/cetak_no_lampiran/SM-" + result + "-" + a.getFullYear());
-                        // },
-                        // error: function () {
-                            // alert("Terjadi Kesalahan");
-                        // }
-
-                    // });			
-					var replace = $("input[name='no_setum']").val().replace(".", "") + "_001";//ubah mei surmas8
-					$("#no_lampiran").attr("value", replace);
-					$("#cetak_no_lampiran").attr("href", "<?php echo base_URL(); ?>admin/cetak_no_lampiran_sm/" + $("input[name='no_lampiran']").val());//ubah mei surmas8
+					var string = $("input[name='no_setum']").val();
+					var prevFile = "<?= $file_attachment; ?>";
+					var ext = "";
+					if(prevFile!="Tidak ada Dokumen"){
+						ext = prevFile.split('.')[1];
+					}
+                    $.ajax({
+                        method: 'post',
+                        url: "<?php echo base_url(); ?>admin/checkUploadedFile",
+						data:{
+							file : string,
+							ext : ext,
+							path : "<?= base_url(); ?>upload/surat_masuk/"
+						},
+                        success: function (result) {
+							$("#no_lampiran").attr("value", result);
+							$("#cetak_no_lampiran").attr("href", "<?php echo base_URL(); ?>admin/cetak_no_lampiran_sm/" + $("input[name='no_lampiran']").val());
+                        },
+                        error: function () {
+                            alert("Terjadi Kesalahan");
+                        }
+                    });
                 });
 
                 /*
@@ -553,98 +558,83 @@ $mode = $this->uri->segment(3);
 
 </div>
 <script>
-function ganti(isi){//ubah mei surmas5
-        // alert(isi);
+function ganti(isi){
         if(isi == 4){
-            $.post("<?php echo base_url().'admin/set_nosetum/' ?>",{id:isi},function (data) {
-                // console.log(data);
+            $.post("<?php echo base_url().'admin/set_nosetum/' ?>",{id:isi,idsurat:<?= $idp; ?>},function (data) {
                 var isi_awal = data;
                 var tambah = "Tgmr/";
                 var jadi = tambah+isi_awal;
-                // console.log(jadi);
+				if(data=="nomorsetumalreadyexist"){
+					jadi = "<?= $no_setum; ?>";
+				}
                 document.getElementById("no_setum").value = jadi;//ubah mei surmas0
             });
-            // var isi_awal = "<?php echo $generated_no_surat ?>";
-        // document.getElementById("no_surat").value = jadi;
         }
         if(isi == 3){
-             $.post("<?php echo base_url().'admin/set_nosetum/' ?>",{id:isi},function (data) {
-                // console.log(data);
+             $.post("<?php echo base_url().'admin/set_nosetum/' ?>",{id:isi,idsurat:<?= $idp; ?>},function (data) {
                 var isi_awal = data;
                 var tambah = "Tgmb/";
                 var jadi = tambah+isi_awal;
-                // console.log(jadi);
+				if(data=="nomorsetumalreadyexist"){
+					jadi = "<?= $no_setum; ?>";
+				}
                 document.getElementById("no_setum").value = jadi;//ubah mei surmas0
             });
-            // var isi_awal = "<?php echo $generated_no_surat ?>";
-        // document.getElementById("no_surat").value = jadi;
         }
         if(isi == 6){
-             $.post("<?php echo base_url().'admin/set_nosetum/' ?>",{id:isi},function (data) {
-                // console.log(data);
+             $.post("<?php echo base_url().'admin/set_nosetum/' ?>",{id:isi,idsurat:<?= $idp; ?>},function (data) {
                 var isi_awal = data;
                 var tambah = "B/Und.";
                 var jadi = tambah+isi_awal;
-                // console.log(jadi);
+				if(data=="nomorsetumalreadyexist"){
+					jadi = "<?= $no_setum; ?>";
+				}
                 document.getElementById("no_setum").value = jadi;//ubah mei surmas0
             });
-            // var isi_awal = "<?php echo $generated_no_surat ?>";
-        // document.getElementById("no_surat").value = jadi;
         }
         if(isi == 2){
-             $.post("<?php echo base_url().'admin/set_nosetum/' ?>",{id:isi},function (data) {
-                // console.log(data);
+             $.post("<?php echo base_url().'admin/set_nosetum/' ?>",{id:isi,idsurat:<?= $idp; ?>},function (data) {
                 var isi_awal = data;
                 var tambah = "R/";
                 var jadi = tambah+isi_awal;
-                // console.log(jadi);
+				if(data=="nomorsetumalreadyexist"){
+					jadi = "<?= $no_setum; ?>";
+				}
                 document.getElementById("no_setum").value = jadi;//ubah mei surmas0
             });
-            // var isi_awal = "<?php echo $generated_no_surat ?>";
-        // document.getElementById("no_surat").value = jadi;
         }
         if(isi == 1){
-             $.post("<?php echo base_url().'admin/set_nosetum/' ?>",{id:isi},function (data) {
-                // console.log(data);
+             $.post("<?php echo base_url().'admin/set_nosetum/' ?>",{id:isi,idsurat:<?= $idp; ?>},function (data) {
                 var isi_awal = data;
                 var tambah = "B/";
                 var jadi = tambah+isi_awal;
-                // console.log(jadi);
+				if(data=="nomorsetumalreadyexist"){
+					jadi = "<?= $no_setum; ?>";
+				}
                 document.getElementById("no_setum").value = jadi;//ubah mei surmas0
             });
-            // var isi_awal = "<?php echo $generated_no_surat ?>";
-        // document.getElementById("no_surat").value = jadi;
         }
         if(isi == 5){
-             $.post("<?php echo base_url().'admin/set_nosetum/' ?>",{id:isi},function (data) {
-                // console.log(data);
+             $.post("<?php echo base_url().'admin/set_nosetum/' ?>",{id:isi,idsurat:<?= $idp; ?>},function (data) {
                 var isi_awal = data;
                 var tambah = "B/Lua.";
                 var jadi = tambah+isi_awal;
-                // console.log(jadi);
+				if(data=="nomorsetumalreadyexist"){
+					jadi = "<?= $no_setum; ?>";
+				}
                 document.getElementById("no_setum").value = jadi;//ubah mei surmas0
             });
-            // var isi_awal = "<?php echo $generated_no_surat ?>";
-        // document.getElementById("no_surat").value = jadi;
         }
 		var abcd = $("#jenis_surat").val();
-		// alert(abcd);
+		
 		 $.get('<?php echo base_url().'admin/ambiltugas/' ?>',{ abcd:abcd, selected:<?= $datpil->id_taks; ?>},function(data){
               console.log(data);
-              // alert(nofi);
              $('#listtugas').html(data);
-             
-
-              
           });
 		  
 		 $.get('<?php echo base_url().'admin/ambilaja/' ?>',{ abcd:abcd},function(data){
               console.log(data);
-              // alert(nofi);
              $('#clnya').html(data);
-             
-
-              
           });
         
      }

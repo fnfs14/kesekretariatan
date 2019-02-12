@@ -4621,8 +4621,20 @@ ORDER BY updated_at DESC")->result();
 
     public function set_nosetum()//ubah mei surmas5
     {
+		if(isset($_POST['idsurat'])){
+			$id = $_POST['idsurat'];
+			$jenis = $_POST['id'];
+			$check = $this->db->query("
+				SELECT no_setum
+				FROM notadinas.surat_masuk
+				WHERE
+					id = $id
+					AND id_jenis_surat_masuk = $jenis")->row();
+			echo "nomorsetumalreadyexist";
+			die();
+		}
         $year = "/" . $this->angka_romawi(date('n')) . "/" . date('Y');
-        $b = $this->db->query("SELECT * FROM notadinas.surat_masuk WHERE no_setum LIKE '%$year';")->result();//coba ganti mei
+        $b = $this->db->query("SELECT no_setum FROM notadinas.surat_masuk WHERE no_setum LIKE '%$year';")->result();
         $c = 0;
         $idis = $_POST['id'];
         $f = [];
@@ -5323,5 +5335,36 @@ ORDER BY updated_at DESC")->result();
 				if($this->session->userdata('admin_jabatan')==$bl->kepada and $bl->opened==100 and $bl->tujuan_status == 0){
 				}
 		
+	}
+	function getApp()
+	{
+		$project = explode('/', $_SERVER['REQUEST_URI'])[1];
+		return $project;
+	}
+	public function checkUploadedFile(){
+		$file = $_POST['file'];
+		$path = $_POST['path'];
+		$ext = $_POST['ext'];
+		$array = ["/","."];
+		foreach($array as $a){
+			$file = str_replace($a,'',$file);
+		}
+		$oriFile = $file;
+		$cond = 0;
+		$vers = 1;
+		$file = $oriFile.'_'.$vers;
+		$app = $this->getApp();
+		$filepath = dirname(FCPATH)."\\$app\\upload\surat_masuk\\$oriFile"."_$vers.$ext";
+		while($cond==0){
+			if(file_exists($filepath)) {  
+				$vers = $vers + 1;
+				$file = $oriFile.'_'.$vers;
+				$filepath = dirname(FCPATH)."\\$app\\upload\surat_masuk\\$oriFile"."_$vers.$ext";
+				$cond = 0;
+			}else{
+				$cond = 1;
+			}
+		}
+		echo $file;
 	}
 }
