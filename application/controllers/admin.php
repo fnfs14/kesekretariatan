@@ -1108,7 +1108,7 @@ ORDER BY updated_at DESC")->result();
 
                 $this->db->query("INSERT INTO notadinas.surat_masuk VALUES ($idp, '$tgl_surat', '$instansi', '$no_surat', '$perihal', '$keterangan', '$kepada', '$no_setum', '$tgl_setum2', '$klasifikasi', '$derajat', '$_status_surat_masuk', '" . $this->session->userdata('admin_id') . "' ,'" . $up_data['file_name'] . "','$_opened','$ruang','$rak','$box','$baris','$jenis','0','0','0')");
             } else {
-                $this->db->query("INSERT INTO notadinas.surat_masuk VALUES ($idp, '$tgl_surat', '$instansi', '$no_surat', '$perihal', '$keterangan', '$kepada', '$no_setum', '$tgl_setum2', '$klasifikasi', '$derajat', '$_status_surat_masuk', '" . $this->session->userdata('admin_id') . "' , $prevSuratMasuk->file_attachment,'$_opened','$ruang','$rak','$box','$baris','$jenis','0','0','0')");
+                $this->db->query("INSERT INTO notadinas.surat_masuk VALUES ($idp, '$tgl_surat', '$instansi', '$no_surat', '$perihal', '$keterangan', '$kepada', '$no_setum', '$tgl_setum2', '$klasifikasi', '$derajat', '$_status_surat_masuk', '" . $this->session->userdata('admin_id') . "' , '" . $prevSuratMasuk->file_attachment . "' ,'$_opened','$ruang','$rak','$box','$baris','$jenis','0','0','0')");
             }
 			$baruinputtadi = $this->db->query('SELECT max(id) as greed FROM notadinas.surat_masuk ')->row();
 			$maxsm = $baruinputtadi->greed;
