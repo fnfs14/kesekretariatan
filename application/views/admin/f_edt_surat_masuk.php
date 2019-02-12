@@ -625,6 +625,7 @@ function ganti(isi){
                 document.getElementById("no_setum").value = jadi;//ubah mei surmas0
             });
         }
+		
 		var abcd = $("#jenis_surat").val();
 		
 		 $.get('<?php echo base_url().'admin/ambiltugas/' ?>',{ abcd:abcd, selected:<?= $datpil->id_taks; ?>},function(data){
