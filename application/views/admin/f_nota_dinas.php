@@ -1,6 +1,30 @@
+<style>
+    .custom-combobox {
+        position: relative;
+        display: inline-block;
+    }
+
+    .custom-combobox-toggle {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        margin-left: -1px;
+        padding: 0;
+    }
+
+    .custom-combobox-input {
+        margin: 0;
+        padding: 5px 10px;
+    }
+
+    input.ui-state-default {
+        background: white;
+    }
+</style>
 <link rel="stylesheet" href="<?php echo base_url(); ?>aset/css/bootstrap-datetimepicker.min.css" media="screen">
 <script src="<?php echo base_url(); ?>aset/js/moment-with-locales.min.js"></script>
 <script src="<?php echo base_url(); ?>aset/js/bootstrap-datetimepicker.min.js"></script>
+<script src="<?= base_url() ?>aset/js/autocomplete.js"></script>
 <script>
 function validate(str) {
 	// var n = str.includes("/");
@@ -290,16 +314,18 @@ if($this->session->userdata('admin_jabatan')==2){
 		<tr>
 			<td width="15%">Rujukan Kegiatan</td>
 			<td width="30%">
-				<select tabindex='1' name='kegiatan' id="tagSelectKegiatan" required class='form-control' >
-					<option value="" style="display: none;">- Pilih Kegiatan -</option>
-					<?php foreach ($kegiatan as $a) {
-						if ($a->id_kegiatan == $keg_id) {
-						echo "<option value='$a->id_kegiatan' selected>$a->nama_kegiatan</option>";
-						} else {
-							echo "<option value='$a->id_kegiatan'>$a->nama_kegiatan</option>";
-						}
-					} ?>
-				</select>
+				<div class="ui-widget">
+					<select tabindex='1' name='kegiatan' id="combobox" required class='form-control' >
+						<option value="" style="display: none;">- Pilih Kegiatan -</option>
+						<?php foreach ($kegiatan as $a) {
+							if ($a->id_kegiatan == $keg_id) {
+							echo "<option value='$a->id_kegiatan' selected>$a->nama_kegiatan</option>";
+							} else {
+								echo "<option value='$a->id_kegiatan'>$a->nama_kegiatan</option>";
+							}
+						} ?>
+					</select>
+				</div>
 			</td>
 			<td>
 			<button id="addNewKegiatan" class="btn btn-default btn-sm" type="button">
@@ -325,7 +351,7 @@ if($this->session->userdata('admin_jabatan')==2){
 						}else if(result=="null"){
 							alert("mohon untuk mengisi data dengan benar.");
 						}else{
-							$("#tagSelectKegiatan").html(result);
+							$("#combobox").html(result);
 						}
 					},
 			        error: function(){

@@ -35,9 +35,9 @@ class Welcome extends CI_Controller {
 		echo "</pre>\n";
 		die;
 	}
-	public function inputKegiatan(){
+	public function inputRuangKerja(){
 		$this->eoffice = $this->load->database('eoffice', TRUE);
-		$dataQ = $this->arrayZ();
+		$dataQ = $this->arrayInputRuangKerja();
 		foreach($dataQ as $q => $wq){
 			foreach($wq as $z => $zx){
 				$id_jenissurat = $q;
@@ -99,7 +99,7 @@ class Welcome extends CI_Controller {
 			}
 		}
 	}
-	public function arrayZ(){
+	public function arrayInputRuangKerja(){
 		$array = [
 			1=>[
 				'PERMOHONAN ANGGARAN',
@@ -169,5 +169,12 @@ class Welcome extends CI_Controller {
 		];
 		return $array;
 	}
-	
+	public function InputKegiatan(){
+		$array = ['KEPUTUSAN/PERATURAN KAPUSHIDROSAL','KEPUTUSAN/PERATURAN KASAL','KEPUTUSAN/PERATURAN MENTERI','KEPUTUSAN/PERATURAN PRESIDEN','LAPORAN KEGIATAN','LAPORAN KEJADIAN/KECELAKAAN','LAPORAN LAIN-LAIN','LAPORAN RAPAT','LAPORAN SURVEI','LUAR NEGERI-EAHC','LUAR NEGERI-IHO','LUAR NEGERI-IMO','LUAR NEGERI-JHA','LUAR NEGERI-SWPHC','LUAR NEGERI-UKHO','PERJANJIAN KERJASAMA (PKS) INSTANSI LAIN','PERJANJIAN KERJASAMA (PKS) KEMENTERIAN/LEMBAGA','PERJANJIAN KERJASAMA (PKS) LUAR NEGERI','PERJANJIAN KERJASAMA (PKS) PERGURUAN TINGGI/FAKULTAS','PERMOHONAN ANGGARAN','PERMOHONAN ASISTENSI','PERMOHONAN DATA/PETA','PERMOHONAN LAIN-LAIN','PERMOHONAN NARASUMBER','PERMOHONAN PERSONEL','PERMOHONAN SURVEI (LO/SO/TO)','PRAKTEK KERJA LAPANGAN MAHASISWA','PRAKTEK KERJA LAPANGAN SMU/SMK','PRAKTEK KERJA LAPANGAN TNI/TNI AL','RENCANA GARIS BESAR (RGB) HARI HIDROGRAFI','RENCANA GARIS BESAR (RGB) LATSURTA','SURAT PERINTAH INSPEKSI/SURVEI','SURAT PERINTAH LUAR NEGERI','SURAT PERINTAH MUTASI KELUAR','SURAT PERINTAH MUTASI MASUK','SURAT PERINTAH PENEMPATAN','SURAT PERINTAH TIM POKJA','UNDANGAN RAPAT FGD','UNDANGAN RAPAT INTERN','UNDANGAN RAPAT KEMENTERIAN/LEMBAGA','UNDANGAN RAPAT TNI/TNI AL','UNDANGAN SERTIJAB/PISAH SAMBUT','UNDANGAN SIDANG KENKAT','UNDANGAN SIDANG PATJAB','UNDANGAN UPACARA/PERESMIAN'];
+		$this->db->query("DELETE FROM notadinas.kegiatan_dinas");
+		foreach($array as $a){
+			$id = $this->db->query("SELECT MAX(id_kegiatan) AS qwe FROM notadinas.kegiatan_dinas")->row()->qwe + 1;
+			$this->db->query("INSERT INTO notadinas.kegiatan_dinas VALUES($id, '$a')");
+		}
+	}
 }
