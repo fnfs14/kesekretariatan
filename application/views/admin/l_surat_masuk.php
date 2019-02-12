@@ -140,12 +140,7 @@ display: none;
 							$jabatanQ = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE id = $tmpJabatan")->row();
 						//	echo $jabatanQ->nama_jabatan . ", ";
 						}
-					}
-				} ?>
-				
-				
-				<?php 
-				$disposisiQz = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk INNER JOIN notadinas.master_jabatan ON notadinas.master_jabatan.id =  notadinas.disposisi_surat_masuk.penerima_disposisi WHERE id_surat_masuk = $b->id ORDER BY urut_jabatan ASC")->result();
+						$disposisiQz = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk INNER JOIN notadinas.master_jabatan ON notadinas.master_jabatan.id =  notadinas.disposisi_surat_masuk.penerima_disposisi WHERE id_surat_masuk = $b->id ORDER BY urut_jabatan ASC")->result();
 				$StatDispC = 0;
 				// while($StatDispC < 2){
 					foreach($disposisiQz as $q){
@@ -193,6 +188,12 @@ display: none;
 					//n
 						
 					}
+					}
+				} ?>
+				
+				
+				<?php 
+				
 				?>
 			</td>
 			<?php 
