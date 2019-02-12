@@ -25,7 +25,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 // $config['base_url']	      = "http://".$_SERVER['SERVER_NAME']."/";
 // /*
-$config['base_url']	      = "http://".$_SERVER['SERVER_NAME']."/kesekretariatan_pushidrosalv8/";
+$config['base_url']	      = "http://".$_SERVER['SERVER_NAME'].":88/kesekretariatan/";
 // */
 $config['index_page']     = '';
 $config['uri_protocol']	  = 'AUTO';
