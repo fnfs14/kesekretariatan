@@ -4433,7 +4433,7 @@ ORDER BY updated_at DESC")->result();
 			INNER JOIN notadinas.master_user
 				ON notadinas.master_user.id = notadinas.log_user.user".
 			$search_query."
-			ORDER BY notadinas.log_user.datetime ASC";
+			ORDER BY notadinas.log_user.datetime DESC";
 		$recordsTotal = $this->db->query($query)->num_rows(); //count all data by id sub category
 		$perpage = " OFFSET $start LIMIT $length";
 		$query = $this->db->query($query . $perpage)->result();
