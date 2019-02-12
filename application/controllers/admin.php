@@ -912,9 +912,9 @@ ORDER BY updated_at DESC")->result();
         //upload config
         $config['upload_path'] = './upload/surat_masuk';
         $config['allowed_types'] = 'gif|jpg|png|pdf|doc|docx';
-        $config['max_size'] = '2000000';
-        $config['max_width'] = '30000';
-        $config['max_height'] = '30000';
+        // $config['max_size'] = '2000000';
+        // $config['max_width'] = '30000';
+        // $config['max_height'] = '30000';
         $config['file_name'] = str_replace('.','',$this->input->post('no_lampiran'));
 
         $this->load->library('upload', $config);
@@ -4424,7 +4424,16 @@ ORDER BY updated_at DESC")->result();
 		if($search!=null and $search!=""){ //if filter is on
 			$search_query = " WHERE notadinas.master_user.nama_lengkap ILIKE '%$search%'";
 		}
-		$query = "SELECT notadinas.log_user.user, notadinas.master_user.nama_lengkap, notadinas.log_user.datetime FROM notadinas.log_user INNER JOIN notadinas.master_user ON notadinas.master_user.id = notadinas.log_user.user".$search_query." ORDER BY notadinas.log_user.datetime DESC";
+		$query = "
+			SELECT 
+				notadinas.log_user.user,
+				notadinas.master_user.nama_lengkap,
+				to_char(notadinas.log_user.datetime, 'MM-DD-YYYY HH24:MI') AS datetime
+			FROM notadinas.log_user
+			INNER JOIN notadinas.master_user
+				ON notadinas.master_user.id = notadinas.log_user.user".
+			$search_query."
+			ORDER BY notadinas.log_user.datetime ASC";
 		$recordsTotal = $this->db->query($query)->num_rows(); //count all data by id sub category
 		$perpage = " OFFSET $start LIMIT $length";
 		$query = $this->db->query($query . $perpage)->result();
