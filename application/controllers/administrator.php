@@ -98,6 +98,7 @@ class Administrator extends CI_Controller {
         $pesan = $_POST['pesan'];
         $id = $_POST['id'];
         $time = date('H:i:s');
+		$checkJab = [];
 		$this->db->query("UPDATE notadinas.surat_masuk_waka SET status = 'Sudah Feedbak = Selesai' WHERE surat_masuk = $id");
         $pengirim = $this->session->userdata('admin_jabatan');
         // $setum = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE satuan = '6' AND tingkatan = '1'")->result();
@@ -115,6 +116,16 @@ class Administrator extends CI_Controller {
 		//n }
         $disp = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = '".$id."' AND penerima_disposisi_satuan IS NULL")->result();
         foreach ($disp as $key) {
+            if($key->penerima_disposisi != $pengirim and !isset($array[$key->penerima_disposisi])){
+                $this->db->query("INSERT INTO notadinas.feedback_surat_masuk (id_surat_masuk,pengirim,pesan_feedback,created_at,waktu,penerima) VALUES ($id,$pengirim,'$pesan','NOW()','$time','".$key->penerima_disposisi."')");
+				$array[$key->penerima_disposisi] = true;
+            }else if(!isset($array[$key->penerima_disposisi])){
+                $this->db->query("INSERT INTO notadinas.feedback_surat_masuk (id_surat_masuk,pengirim,pesan_feedback,created_at,waktu,baca,penerima) VALUES ($id,$pengirim,'$pesan','NOW()','$time', '1','".$key->penerima_disposisi."')");
+				$array[$key->penerima_disposisi] = true;
+            }
+         } 
+        $kadisp = $this->db->query("SELECT penerima_disposisi_satuan AS penerima_disposisi FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = '".$id."' AND penerima_disposisi_satuan IS NOT NULL")->result();
+        foreach ($kadisp as $key) {
             if($key->penerima_disposisi != $pengirim and !isset($array[$key->penerima_disposisi])){
                 $this->db->query("INSERT INTO notadinas.feedback_surat_masuk (id_surat_masuk,pengirim,pesan_feedback,created_at,waktu,penerima) VALUES ($id,$pengirim,'$pesan','NOW()','$time','".$key->penerima_disposisi."')");
 				$array[$key->penerima_disposisi] = true;
