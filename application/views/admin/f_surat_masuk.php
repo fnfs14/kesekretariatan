@@ -1146,7 +1146,12 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
 		($act != "kadisp" && $act != "subdisp")
 		or ($checkJabatan!=NULL and $checkJabatan->tingkatan==2)
 		or ($checkJabatan!=NULL and $checkDisp!=NULL and $checkDisp->jenis=='INFORMASI')
-		or ($checkJabatan!=NULL and $checkJabatan->id!=1 and $checkJabatan->id!=28)
+		or (
+			$checkJabatan!=NULL
+			and $checkJabatan->id!=1
+			and $checkJabatan->id!=28
+			and $checkJabatan->id!=$this->session->userdata('admin_jabatan')
+			)
 		or (
 			$this->session->userdata('admin_tingkatan')==2
 			and (
