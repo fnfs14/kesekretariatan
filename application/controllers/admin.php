@@ -1105,10 +1105,10 @@ ORDER BY updated_at DESC")->result();
             if ($this->upload->do_upload('file_attachment')) {
                 $up_data = $this->upload->data();
 
-                $this->db->query("INSERT INTO notadinas.surat_masuk VALUES (DEFAULT, '$tgl_surat', '$instansi', '$no_surat', '$perihal', '$keterangan', '$kepada', '$no_setum', '$tgl_setum2', '$klasifikasi', '$derajat', '$_status_surat_masuk', '" . $this->session->userdata('admin_id') . "' ,'" . $up_data['file_name'] . "','$_opened','$ruang','$rak','$box','$baris','$jenis','0','0','0')");//ubah surat masuk mei
+                $this->db->query("INSERT INTO notadinas.surat_masuk VALUES ($idp, '$tgl_surat', '$instansi', '$no_surat', '$perihal', '$keterangan', '$kepada', '$no_setum', '$tgl_setum2', '$klasifikasi', '$derajat', '$_status_surat_masuk', '" . $this->session->userdata('admin_id') . "' ,'" . $up_data['file_name'] . "','$_opened','$ruang','$rak','$box','$baris','$jenis','0','0','0')");//ubah surat masuk mei
 
             } else {
-                $this->db->query("INSERT INTO notadinas.surat_masuk VALUES (DEFAULT, '$tgl_surat', '$instansi', '$no_surat', '$perihal', '$keterangan', '$kepada', '$no_setum', '$tgl_setum2', '$klasifikasi', '$derajat', '$_status_surat_masuk', '" . $this->session->userdata('admin_id') . "' , 'Tidak ada Dokumen','$_opened','$ruang','$rak','$box','$baris','$jenis','0','0','0')");//ubah mei bahasa //ubah surat masuk mei
+                $this->db->query("INSERT INTO notadinas.surat_masuk VALUES ($idp, '$tgl_surat', '$instansi', '$no_surat', '$perihal', '$keterangan', '$kepada', '$no_setum', '$tgl_setum2', '$klasifikasi', '$derajat', '$_status_surat_masuk', '" . $this->session->userdata('admin_id') . "' , 'Tidak ada Dokumen','$_opened','$ruang','$rak','$box','$baris','$jenis','0','0','0')");//ubah mei bahasa //ubah surat masuk mei
             }
 			$baruinputtadi = $this->db->query('SELECT max(id) as greed FROM notadinas.surat_masuk ')->row();
 			$maxsm = $baruinputtadi->greed;
@@ -1116,7 +1116,7 @@ ORDER BY updated_at DESC")->result();
            
             date_default_timezone_set('Asia/Jakarta');
 			$_waktu = date('H:i:s');
-            $id = $this->db->query("SELECT MAX(id) AS qwe FROM notadinas.surat_masuk")->row();
+            $id = $this->db->query("SELECT id AS qwe FROM notadinas.surat_masuk WHERE id = $idp")->row();
 			$this->db->query("UPDATE notadinas.surat_masuk SET updated_at = '$upd_date' WHERE id = '$id->qwe'");
             $this->db->query("INSERT INTO notadinas.log_proses_surat_masuk VALUES (DEFAULT,$id->qwe,NOW(),'" . $this->session->userdata('admin_id') . "','$kepada','$keterangan','1','" . $this->session->userdata('admin_id') . "','$_waktu')");
             $_tmp_log_id = $this->db->query("SELECT MAX(id) AS qwe FROM notadinas.log_proses_surat_masuk")->row();
