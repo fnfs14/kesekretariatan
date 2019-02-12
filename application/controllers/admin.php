@@ -912,9 +912,9 @@ ORDER BY updated_at DESC")->result();
         //upload config
         $config['upload_path'] = './upload/surat_masuk';
         $config['allowed_types'] = 'gif|jpg|png|pdf|doc|docx';
-        $config['max_size'] = '2000000';
-        $config['max_width'] = '30000';
-        $config['max_height'] = '30000';
+        // $config['max_size'] = '2000000';
+        // $config['max_width'] = '30000';
+        // $config['max_height'] = '30000';
         $config['file_name'] = str_replace('.','',$this->input->post('no_lampiran'));
 
         $this->load->library('upload', $config);
@@ -1047,28 +1047,28 @@ ORDER BY updated_at DESC")->result();
 
             $a['page'] = "show_surat_masuk";
          }else if ($mau_ke == "edited") {//ubah surat masuk mei
-            $year = "/" . $this->session->userdata('admin_id') . "/" . date('Y');
-                $b = $this->db->query("SELECT * FROM notadinas.surat_masuk WHERE no_surat LIKE '%$year';")->result();
-                $c = 0;
-                foreach ($b as $d) {
-                    $e = explode('/', $d->no_surat);
-                    if ($e[0] > $c) {
-                        $c = $e[0];
-                    }
-                }
-                $max = $c + 1;
-                if (strlen($max) < 4) {
-                    if (strlen($max) < 3) {
-                        if (strlen($max) < 2) {
-                            $max = "000" . $max;
-                        } else {
-                            $max = "00" . $max;
-                        }
-                    } else {
-                        $max = "0" . $max;
-                    }
-                }
-                $a['generated_no_surat'] = $max . "/" . $this->session->userdata('admin_id') . "/" . date('Y');
+            // $year = "/" . $this->session->userdata('admin_id') . "/" . date('Y');
+                // $b = $this->db->query("SELECT * FROM notadinas.surat_masuk WHERE no_surat LIKE '%$year';")->result();
+                // $c = 0;
+                // foreach ($b as $d) {
+                    // $e = explode('/', $d->no_surat);
+                    // if ($e[0] > $c) {
+                        // $c = $e[0];
+                    // }
+                // }
+                // $max = $c + 1;
+                // if (strlen($max) < 4) {
+                    // if (strlen($max) < 3) {
+                        // if (strlen($max) < 2) {
+                            // $max = "000" . $max;
+                        // } else {
+                            // $max = "00" . $max;
+                        // }
+                    // } else {
+                        // $max = "0" . $max;
+                    // }
+                // }
+                // $a['generated_no_surat'] = $max . "/" . $this->session->userdata('admin_id') . "/" . date('Y');
             $a['tujuan'] = $this->db->query("SELECT * FROM notadinas.master_tujuan")->result();
             $a['datpil'] = $this->db->query("SELECT * FROM notadinas.surat_masuk WHERE id = '$idu' ")->row();
             $a['ruang'] = $this->db->query("SELECT * FROM notadinas.master_ruang")->result();
@@ -1105,10 +1105,10 @@ ORDER BY updated_at DESC")->result();
             if ($this->upload->do_upload('file_attachment')) {
                 $up_data = $this->upload->data();
 
-                $this->db->query("INSERT INTO notadinas.surat_masuk VALUES (DEFAULT, '$tgl_surat', '$instansi', '$no_surat', '$perihal', '$keterangan', '$kepada', '$no_setum', '$tgl_setum2', '$klasifikasi', '$derajat', '$_status_surat_masuk', '" . $this->session->userdata('admin_id') . "' ,'" . $up_data['file_name'] . "','$_opened','$ruang','$rak','$box','$baris','$jenis','0','0','0')");//ubah surat masuk mei
+                $this->db->query("INSERT INTO notadinas.surat_masuk VALUES ($idp, '$tgl_surat', '$instansi', '$no_surat', '$perihal', '$keterangan', '$kepada', '$no_setum', '$tgl_setum2', '$klasifikasi', '$derajat', '$_status_surat_masuk', '" . $this->session->userdata('admin_id') . "' ,'" . $up_data['file_name'] . "','$_opened','$ruang','$rak','$box','$baris','$jenis','0','0','0')");//ubah surat masuk mei
 
             } else {
-                $this->db->query("INSERT INTO notadinas.surat_masuk VALUES (DEFAULT, '$tgl_surat', '$instansi', '$no_surat', '$perihal', '$keterangan', '$kepada', '$no_setum', '$tgl_setum2', '$klasifikasi', '$derajat', '$_status_surat_masuk', '" . $this->session->userdata('admin_id') . "' , 'Tidak ada Dokumen','$_opened','$ruang','$rak','$box','$baris','$jenis','0','0','0')");//ubah mei bahasa //ubah surat masuk mei
+                $this->db->query("INSERT INTO notadinas.surat_masuk VALUES ($idp, '$tgl_surat', '$instansi', '$no_surat', '$perihal', '$keterangan', '$kepada', '$no_setum', '$tgl_setum2', '$klasifikasi', '$derajat', '$_status_surat_masuk', '" . $this->session->userdata('admin_id') . "' , 'Tidak ada Dokumen','$_opened','$ruang','$rak','$box','$baris','$jenis','0','0','0')");//ubah mei bahasa //ubah surat masuk mei
             }
 			$baruinputtadi = $this->db->query('SELECT max(id) as greed FROM notadinas.surat_masuk ')->row();
 			$maxsm = $baruinputtadi->greed;
@@ -1116,7 +1116,7 @@ ORDER BY updated_at DESC")->result();
            
             date_default_timezone_set('Asia/Jakarta');
 			$_waktu = date('H:i:s');
-            $id = $this->db->query("SELECT MAX(id) AS qwe FROM notadinas.surat_masuk")->row();
+            $id = $this->db->query("SELECT id AS qwe FROM notadinas.surat_masuk WHERE id = $idp")->row();
 			$this->db->query("UPDATE notadinas.surat_masuk SET updated_at = '$upd_date' WHERE id = '$id->qwe'");
             $this->db->query("INSERT INTO notadinas.log_proses_surat_masuk VALUES (DEFAULT,$id->qwe,NOW(),'" . $this->session->userdata('admin_id') . "','$kepada','$keterangan','1','" . $this->session->userdata('admin_id') . "','$_waktu')");
             $_tmp_log_id = $this->db->query("SELECT MAX(id) AS qwe FROM notadinas.log_proses_surat_masuk")->row();
@@ -4424,7 +4424,16 @@ ORDER BY updated_at DESC")->result();
 		if($search!=null and $search!=""){ //if filter is on
 			$search_query = " WHERE notadinas.master_user.nama_lengkap ILIKE '%$search%'";
 		}
-		$query = "SELECT notadinas.log_user.user, notadinas.master_user.nama_lengkap, notadinas.log_user.datetime FROM notadinas.log_user INNER JOIN notadinas.master_user ON notadinas.master_user.id = notadinas.log_user.user".$search_query." ORDER BY notadinas.log_user.datetime DESC";
+		$query = "
+			SELECT 
+				notadinas.log_user.user,
+				notadinas.master_user.nama_lengkap,
+				to_char(notadinas.log_user.datetime, 'MM-DD-YYYY HH24:MI') AS datetime
+			FROM notadinas.log_user
+			INNER JOIN notadinas.master_user
+				ON notadinas.master_user.id = notadinas.log_user.user".
+			$search_query."
+			ORDER BY notadinas.log_user.datetime DESC";
 		$recordsTotal = $this->db->query($query)->num_rows(); //count all data by id sub category
 		$perpage = " OFFSET $start LIMIT $length";
 		$query = $this->db->query($query . $perpage)->result();
