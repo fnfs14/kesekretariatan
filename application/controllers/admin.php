@@ -76,8 +76,8 @@ ORDER BY updated_at DESC")->result();
 					ON notadinas.master_jabatan.id = notadinas.master_user.jabatan
 				WHERE notadinas.surat_keluar.id = " . $bl->idnya)->row();
 			if($bl->tablenya=="masuk" and !isset($notif['masuk'][$bl->idnya])){
-				$_tembusan = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = $bl->idnya AND penerima_disposisi = " . $jabatan . "AND status = 1 AND (penerima_disposisi=1 OR penerima_disposisi=28)")->row();
-				if($_tembusan!=NULL and count($_tembusan)!=0){
+				$_tembusan = $this->db->query("SELECT COUNT(id) AS z FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = $bl->idnya AND penerima_disposisi = " . $this->session->userdata('admin_jabatan') . "AND status = 1 AND (penerima_disposisi=1 OR penerima_disposisi=28)")->row();
+				if($_tembusan->z!=0){
 					$_check .= "masuk - 1 ~ ";
 					$zxc = $zxc + 1;
 					$msk = $msk + 1;

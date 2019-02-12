@@ -720,8 +720,8 @@ ORDER BY updated_at DESC")->result();
 							}
 						}
 					}else if($bl->tablenya=="masuk" and !isset($notif['masuk'][$bl->idnya])){
-						$_tembusan = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = $bl->idnya AND penerima_disposisi = " . $this->session->userdata('admin_jabatan') . "AND status = 1 AND (penerima_disposisi=1 OR penerima_disposisi=28)")->row();
-						if($_tembusan!=NULL and count($_tembusan)!=0){
+						$_tembusan = $this->db->query("SELECT COUNT(id) AS z FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = $bl->idnya AND penerima_disposisi = " . $this->session->userdata('admin_jabatan') . "AND status = 1 AND (penerima_disposisi=1 OR penerima_disposisi=28)")->row();
+						if($_tembusan->z!=0){
 							$originalDate = $bl->updated_at;
 							$newDate = date("j M Y H:i", strtotime($originalDate));
 							abcd($zxc+1,"Surat Masuk",$bl->idnya, $bl->perihal,$newDate,'/surat_masuk/disp/');
