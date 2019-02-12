@@ -1142,7 +1142,21 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
 	}
 	$checkDisp = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = $idp AND $dispCol = " . $this->session->userdata('admin_jabatan'))->row();
  }
- if(($act != "kadisp" && $act != "subdisp") or ($checkJabatan!=NULL and $checkJabatan->tingkatan==2) or ($checkJabatan!=NULL and $checkDisp!=NULL and $checkDisp->jenis=='INFORMASI') or ($checkJabatan!=NULL and $checkJabatan->id!=1 and $checkJabatan->id!=28) or ($this->session->userdata('admin_tingkatan')==2 and !isset($checkSelectedJabatan[$this->session->userdata('admin_tingkatan')]))){ ?><!--ubah surat masuk mei-->
+	if(
+		($act != "kadisp" && $act != "subdisp")
+		or ($checkJabatan!=NULL and $checkJabatan->tingkatan==2)
+		or ($checkJabatan!=NULL and $checkDisp!=NULL and $checkDisp->jenis=='INFORMASI')
+		or ($checkJabatan!=NULL and $checkJabatan->id!=1 and $checkJabatan->id!=28)
+		or (
+			$this->session->userdata('admin_tingkatan')==2
+			and (
+				$this->session->userdata('admin_jabatan')==174
+				or $this->session->userdata('admin_jabatan')==84
+				or $this->session->userdata('admin_jabatan')==162
+				)
+			and !isset($checkSelectedJabatan[$this->session->userdata('admin_tingkatan')])
+			)
+	){ ?>
         <?php // }else if(isset($InfoOrAksi) and $InfoOrAksi->jenis=="INFORMASI"){ ?>
       <!-- <a class="btn btn-success btn-sm" tabindex="4" id="disposisikan_satuan">Kembali</a> -->
         <?php }  else { ?><!--ubah surat masuk mei-->
