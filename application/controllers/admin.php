@@ -1047,28 +1047,28 @@ ORDER BY updated_at DESC")->result();
 
             $a['page'] = "show_surat_masuk";
          }else if ($mau_ke == "edited") {//ubah surat masuk mei
-            $year = "/" . $this->session->userdata('admin_id') . "/" . date('Y');
-                $b = $this->db->query("SELECT * FROM notadinas.surat_masuk WHERE no_surat LIKE '%$year';")->result();
-                $c = 0;
-                foreach ($b as $d) {
-                    $e = explode('/', $d->no_surat);
-                    if ($e[0] > $c) {
-                        $c = $e[0];
-                    }
-                }
-                $max = $c + 1;
-                if (strlen($max) < 4) {
-                    if (strlen($max) < 3) {
-                        if (strlen($max) < 2) {
-                            $max = "000" . $max;
-                        } else {
-                            $max = "00" . $max;
-                        }
-                    } else {
-                        $max = "0" . $max;
-                    }
-                }
-                $a['generated_no_surat'] = $max . "/" . $this->session->userdata('admin_id') . "/" . date('Y');
+            // $year = "/" . $this->session->userdata('admin_id') . "/" . date('Y');
+                // $b = $this->db->query("SELECT * FROM notadinas.surat_masuk WHERE no_surat LIKE '%$year';")->result();
+                // $c = 0;
+                // foreach ($b as $d) {
+                    // $e = explode('/', $d->no_surat);
+                    // if ($e[0] > $c) {
+                        // $c = $e[0];
+                    // }
+                // }
+                // $max = $c + 1;
+                // if (strlen($max) < 4) {
+                    // if (strlen($max) < 3) {
+                        // if (strlen($max) < 2) {
+                            // $max = "000" . $max;
+                        // } else {
+                            // $max = "00" . $max;
+                        // }
+                    // } else {
+                        // $max = "0" . $max;
+                    // }
+                // }
+                // $a['generated_no_surat'] = $max . "/" . $this->session->userdata('admin_id') . "/" . date('Y');
             $a['tujuan'] = $this->db->query("SELECT * FROM notadinas.master_tujuan")->result();
             $a['datpil'] = $this->db->query("SELECT * FROM notadinas.surat_masuk WHERE id = '$idu' ")->row();
             $a['ruang'] = $this->db->query("SELECT * FROM notadinas.master_ruang")->result();
