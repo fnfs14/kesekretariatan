@@ -65,7 +65,7 @@ display: none;
 			<th width="15%">Nomor, Tgl. Surat</th>
 			<th width="10%">Jenis Surat</th><!-- ubah surat masuk mei -->
 			<th width="10%">Status</th><!-- ubah surat masuk mei -->
-			<?php if($this->session->userdata('admin_jabatan')==1 || $this->session->userdata('admin_jabatan')==28 || $this->session->userdata('admin_satuan')==6){ ?>
+			<?php if($this->session->userdata('admin_jabatan')==1 || $this->session->userdata('admin_jabatan')==28 || $this->session->userdata('admin_jabatan')==2){ ?>
 			<th width="10%">Status Disposisi</th><!-- ubah surat masuk mei -->
 		<?php } ?>
 			<th width="30%">Aksi</th><!-- ubah surat masuk mei -->
@@ -82,7 +82,7 @@ display: none;
 		}
 
 		if (empty($data)) { 
-			 if($this->session->userdata('admin_jabatan')==1 || $this->session->userdata('admin_jabatan')==28 || $this->session->userdata('admin_satuan')==6){ 
+			 if($this->session->userdata('admin_jabatan')==1 || $this->session->userdata('admin_jabatan')==28 || $this->session->userdata('admin_jabatan')==2){ 
 			echo "<tr><td colspan='9'  style='text-align: center; font-weight: bold'>--Data tidak ditemukan--</td></tr>";//ubah surat masuk mei
 			}else{
 			echo "<tr><td colspan='8'  style='text-align: center; font-weight: bold'>--Data tidak ditemukan--</td></tr>";//ubah surat masuk mei
@@ -93,7 +93,7 @@ display: none;
 			foreach ($data as $b) {
 				$noset = str_replace("/","_", $b->no_setum);
 				// echo $noset;
-				if(isset($tembusan[$b->id][$jabsatan]) or 6==$this->session->userdata('admin_satuan') or ($this->session->userdata('admin_jabatan')==1) or $this->session->userdata('admin_jabatan')==28 or (isset($b->penerima_disposisi) AND $b->penerima_disposisi==$this->session->userdata('admin_jabatan') AND $this->session->userdata('admin_tingkatan')==2)){
+				if(isset($tembusan[$b->id][$jabsatan]) or 2==$this->session->userdata('admin_jabatan') or ($this->session->userdata('admin_jabatan')==1) or $this->session->userdata('admin_jabatan')==28 or (isset($b->penerima_disposisi) AND $b->penerima_disposisi==$this->session->userdata('admin_jabatan') AND $this->session->userdata('admin_tingkatan')==2)){
 		?>
 		<tr>
 			<td style="text-align: center;"><?php echo $no++; ?></td><!-- ubah mei surmas6 -->
@@ -118,7 +118,7 @@ display: none;
 					$_tmp_query = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE id = $b->kepada")->row();
 					echo $_tmp_query->nama_jabatan;
 				}elseif ($b->status_surat_masuk == 3){
-					if($this->session->userdata('admin_satuan') == 6 || $this->session->userdata('admin_jabatan') == 1 || $this->session->userdata('admin_jabatan') == 28){
+					if($this->session->userdata('admin_jabatan') == 2 || $this->session->userdata('admin_jabatan') == 1 || $this->session->userdata('admin_jabatan') == 28){
 						$_tmp_query = $this->db->query("SELECT * FROM notadinas.log_proses_surat_masuk WHERE id_suratmasuk = $b->id")->row();
 						$_waktu = "";
 						if($_tmp_query->waktu!=""){
@@ -144,7 +144,7 @@ display: none;
 
 				}else{
 					//popo
-					if($this->session->userdata('admin_satuan') == 6 || $this->session->userdata('admin_jabatan') == 1 || $this->session->userdata('admin_jabatan') == 28){
+					if($this->session->userdata('admin_jabatan') == 2 || $this->session->userdata('admin_jabatan') == 1 || $this->session->userdata('admin_jabatan') == 28){
 						$_tmp_query = $this->db->query("SELECT * FROM notadinas.log_proses_surat_masuk WHERE id_suratmasuk = $b->id")->row();
 						$_waktu = "";
 						if($_tmp_query->waktu!=""){
@@ -174,7 +174,7 @@ display: none;
 				
 			</td>
 			<!--ubah surat masuk mei-->
-			<?php if($this->session->userdata('admin_jabatan')==1 || $this->session->userdata('admin_jabatan')==28 || $this->session->userdata('admin_satuan')==6){ ?>
+			<?php if($this->session->userdata('admin_jabatan')==1 || $this->session->userdata('admin_jabatan')==28 || $this->session->userdata('admin_jabatan')==2){ ?>
 			<td>
 				<?php if ($b->status_surat_masuk == 3){
 					
@@ -239,7 +239,7 @@ display: none;
 
 				$feedback = $this->db->query("SELECT * FROM notadinas.feedback_surat_masuk WHERE notadinas.feedback_surat_masuk.baca IS NULL AND  notadinas.feedback_surat_masuk.id_surat_masuk = '".$b->id."'AND notadinas.feedback_surat_masuk.penerima = '".$this->session->userdata('admin_jabatan')."'")->result();
 
-				if ($this->session->userdata('admin_satuan') == 6) {//ubah surat masuk mei
+				if ($this->session->userdata('admin_jabatan') == 2) {//ubah surat masuk mei
 
 					if($b->opened == 10){ ?>
 						

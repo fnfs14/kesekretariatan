@@ -931,7 +931,7 @@ ORDER BY updated_at DESC")->result();
 
 
             $admin = $this->session->userdata('admin_jabatan');
-            if ($this->session->userdata('admin_satuan') == 6) {
+            if ($admin == 2) {
                 $a['data'] = $this->db->query("SELECT *, notadinas.master_tujuan.nama AS instansi, notadinas.surat_masuk.id AS id FROM notadinas.surat_masuk INNER JOIN notadinas.master_tujuan ON notadinas.surat_masuk.instansi = notadinas.master_tujuan.id INNER JOIN notadinas.master_surat_masuk ON notadinas.surat_masuk.id_jenis_surat_masuk = notadinas.master_surat_masuk.id_jenis_surat_masuk WHERE EXTRACT(YEAR FROM tgl_surat) = '$ta' and notadinas.master_surat_masuk.nama_jenis_surat ILIKE '%$cari%' ORDER BY notadinas.surat_masuk.id DESC")->result();//ubah surat masuk mei
             } else if ($admin == 1) {
                 $a['data'] = $this->db->query("SELECT *, notadinas.master_tujuan.nama AS instansi, notadinas.surat_masuk.id AS id FROM notadinas.surat_masuk INNER JOIN notadinas.master_tujuan ON notadinas.surat_masuk.instansi = notadinas.master_tujuan.id INNER JOIN notadinas.master_surat_masuk ON notadinas.surat_masuk.id_jenis_surat_masuk = notadinas.master_surat_masuk.id_jenis_surat_masuk WHERE EXTRACT(YEAR FROM tgl_surat) = '$ta' AND kepada = '1' OR kepada = '28' OR notadinas.master_surat_masuk.nama_jenis_surat ILIKE '%$cari%' ORDER BY notadinas.surat_masuk.id DESC")->result();//ubah surat masuk mei
@@ -2429,7 +2429,7 @@ ORDER BY updated_at DESC")->result();
             redirect(base_url() . 'admin/surat_keluar');
         } else if ($mau_ke == "verifikasi_surat_keluar") {
 			$this->db->query("UPDATE notadinas.tembusan_surat_keluar SET tanggal = '".date('Y-m-d')."' WHERE id_surat_keluar = $idu and id_jabatan = " . $this->session->userdata('admin_jabatan'));
-            if ($this->session->userdata('admin_satuan') == 6) {
+            if ($this->session->userdata('admin_jabatan') == 2) {
                 $year = "/" . $this->session->userdata('admin_id') . "/" . date('Y');
                 //ye
                 $b = $this->db->query("SELECT * FROM notadinas.surat_keluar WHERE no_surat LIKE '%$year';")->result();
@@ -3713,7 +3713,7 @@ ORDER BY updated_at DESC")->result();
             if ($this->session->userdata('admin_jabatan') == 28  or $this->session->userdata('admin_jabatan') == 1) {
                 $a['data'] = $this->db->query("SELECT notadinas.nota_dinas.*, notadinas.master_user.id as user_id, notadinas.master_user.nama_lengkap FROM notadinas.nota_dinas INNER JOIN notadinas.master_user ON notadinas.master_user.id = notadinas.nota_dinas.create_by WHERE EXTRACT(YEAR FROM tgl_surat) = '$ta' LIMIT 10 OFFSET $awal")->result();
             } else if ($this->session->userdata('admin_tingkatan') == 1 or $this->session->userdata('admin_tingkatan') == 2) {
-				if($this->session->userdata('admin_satuan')==6){
+				if($this->session->userdata('admin_jabatan')==2){
 					$reqzx = (isset($_GET['r']))?$_GET['r']:1;
 					if($reqzx==1){
 						$sqlZ = "SELECT notadinas.nota_dinas.*, notadinas.master_user.id as user_id, notadinas.master_user.nama_lengkap FROM notadinas.nota_dinas INNER JOIN notadinas.master_user ON notadinas.master_user.id = notadinas.nota_dinas.create_by INNER JOIN notadinas.master_jabatan ON notadinas.master_user.jabatan = notadinas.master_jabatan.id WHERE EXTRACT(YEAR FROM tgl_surat) = '$ta' AND notadinas.master_jabatan.satuan = 6  ORDER BY id DESC";
@@ -5142,14 +5142,14 @@ ORDER BY updated_at DESC")->result();
                 ];
 
                 echo json_encode($result);
-            }else if($status_surat_keluar==4 and $this->session->userdata('admin_satuan')==6 and $opened==4){
+            }else if($status_surat_keluar==4 and $this->session->userdata('admin_jabatan')==2 and $opened==4){
                 $link = '/surat_keluar/verifikasi_surat_keluar/';
                 $result[] = [
                     'link' => $link
                 ];
 
                 echo json_encode($result);
-            }else if($status_surat_keluar==5 and $this->session->userdata('admin_satuan')==6 and $opened==5){
+            }else if($status_surat_keluar==5 and $this->session->userdata('admin_jabatan')==2 and $opened==5){
                 $link = '/surat_keluar/verifikasi_surat_keluar/';
                 $result[] = [
                     'link' => $link

@@ -47,7 +47,7 @@ if ($mode == "edt" || $mode == "act_edt" || $mode == "verifikasi_surat_keluar" |
     if ($mode == "verifikasi_surat_keluar") {
         if ($this->session->userdata('admin_jabatan') == 1 || $this->session->userdata('admin_jabatan') == 28) {
             $act = 'verifikasi_submit_kapushidrosal/' . $idp;
-        } elseif ($this->session->userdata('admin_satuan') == 6) {
+        } elseif ($this->session->userdata('admin_jabatan') == 2) {
             $act = 'kirim_ke_kapushidrosal/' . $idp;
         } else {
             $act = 'verifikasi_submit/' . $idp;
@@ -72,7 +72,7 @@ if ($mode == "edt" || $mode == "act_edt" || $mode == "verifikasi_surat_keluar" |
     $jenis_surat = "";
     $kirim_ke = "";
 }
-if ($this->session->userdata('admin_satuan') == 6) {
+if ($this->session->userdata('admin_jabatan') == 2) {
     $disabled = "";
 } else {
     $disabled = "disabled";
@@ -271,7 +271,7 @@ if ($this->session->userdata('admin_satuan') == 6) {
 					<td>Nomor Surat</td>
                     <td>
 						<?php
-							if($mode=='verifikasi_surat_keluar' and $this->session->userdata('admin_satuan') == 6){
+							if($mode=='verifikasi_surat_keluar' and $this->session->userdata('admin_jabatan') == 2){
 								$nomor_surat_editable = "";
 							}else{
 								$nomor_surat_editable = "readonly";
@@ -290,7 +290,7 @@ if ($this->session->userdata('admin_satuan') == 6) {
                     <td></td>
                 </tr>
                 <?php
-                            if($mode=='verifikasi_surat_keluar' and $this->session->userdata('admin_satuan') == 6 and $status_surat==5){
+                            if($mode=='verifikasi_surat_keluar' and $this->session->userdata('admin_jabatan') == 2 and $status_surat==5){
                         ?>
                 <tr>
                     <td>Dikirimkan Kepada<span style="color: red;">*</span></td>
@@ -431,7 +431,7 @@ if ($this->session->userdata('admin_satuan') == 6) {
                                                  class="form-control"><?php echo $ket; ?></textarea></b></td>
                 </tr>
 
-				<?php if ($mode!="add" and $this->session->userdata('admin_satuan') == 6){ ?>
+				<?php if ($mode!="add" and $this->session->userdata('admin_jabatan') == 2){ ?>
                 <?php if ($datpil->status_surat_keluar == 4) { ?>
                         <tr>
 							<td style="vertical-align: top;">
@@ -449,7 +449,7 @@ if ($this->session->userdata('admin_satuan') == 6) {
 
 
 
-                <?php //if ($this->session->userdata('admin_satuan') != 6) { ?>
+                <?php //if ($this->session->userdata('admin_jabatan') != 2) { ?>
 
 
                     <tr>
@@ -512,7 +512,7 @@ if ($this->session->userdata('admin_satuan') == 6) {
 									<td>" . $count . "</td>
 									<td>" . $aa->nama_jabatan . "</td>
 									<td>";
-                                    if ($this->session->userdata('admin_jabatan') == 1 or ($datpil->status_surat_keluar==5 and $this->session->userdata('admin_satuan') == 6) or ($datpil->status_surat_keluar==7) ) {
+                                    if ($this->session->userdata('admin_jabatan') == 1 or ($datpil->status_surat_keluar==5 and $this->session->userdata('admin_jabatan') == 2) or ($datpil->status_surat_keluar==7) ) {
                                         echo "<div class='col-md-12'><a class='btn-default btn btn-xs status_tembusan_setuju status_tembusan_setuju" . $aa->idnya_tembusan . "' style='; $asd' status_tembusan='" . $aa->idnya_tembusan . "'>Setuju</a></div>";
                                     } else if (isset($datpil->create_by) and $datpil->create_by != $this->session->userdata('admin_id') or $mode == "edt") {
                                         if ($aa->idnya_jabatan != $this->session->userdata('admin_jabatan')) {
@@ -526,7 +526,7 @@ if ($this->session->userdata('admin_satuan') == 6) {
                                     echo "</td>";
                                     if ($this->session->userdata('admin_id') == $datpil->create_by) {
                                         $tembusan_hidden_show = "";
-										if($this->session->userdata('admin_satuan')==6){
+										if($this->session->userdata('admin_jabatan')==2){
 											$tembusan_hidden_show = "style='display:none;'";
 										}
                                     } else if ($aa->idnya_jabatan != $this->session->userdata('admin_jabatan')) {
@@ -594,7 +594,7 @@ if ($this->session->userdata('admin_satuan') == 6) {
                                 <i class="icon icon-arrow-left icon-white"></i> Kembali
                             </a>
                         <?php } else if (isset($datpil->create_by) and $datpil->create_by == $this->session->userdata('admin_id') || $this->session->userdata('admin_jabatan') == 0){ ?>
-                        <?php if ($this->session->userdata('admin_satuan') == 6 and isset($datpil->create_by) and $datpil->create_by == $this->session->userdata('admin_id')){ ?>
+                        <?php if ($this->session->userdata('admin_jabatan') == 2 and isset($datpil->create_by) and $datpil->create_by == $this->session->userdata('admin_id')){ ?>
 						<?php if ($datpil->status_surat_keluar == 4) { ?>
                         <br/>
                             <button type="submit" class="btn btn-default" tabindex="10"
@@ -625,7 +625,7 @@ if ($this->session->userdata('admin_satuan') == 6) {
                         <?php } //elseif ($this->session->userdata('admin_jabatan') == 1 || $this->session->userdata('admin_jabatan') == 28) {//ubah mei error<!-- ubah ini -->
 
                         //}
-                        elseif ($mode!="add" and $this->session->userdata('admin_satuan') == 6){ ?>
+                        elseif ($mode!="add" and $this->session->userdata('admin_jabatan') == 2){ ?>
                         <?php if ($datpil->status_surat_keluar == 4) { ?>
                         <br/>
                             <button type="submit" class="btn btn-default" tabindex="10"

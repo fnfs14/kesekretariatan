@@ -48,7 +48,7 @@ $total_row = 0;
 
 <?php echo $this->session->flashdata("k");?>
 
-<?php if($this->session->userdata('admin_satuan') == 6){
+<?php if($this->session->userdata('admin_jabatan') == 2){
 	$req = (isset($_GET['r']))?$_GET['r']:1;
 	$activeClass = 'class="active"';
 	?>
@@ -110,7 +110,7 @@ $total_row = 0;
 							if(strpos($b->ka_waka_setum, '1') !== false){ // ka-waka-setum
 								$urlZ = "/kapush";
 							}
-						}elseif($this->session->userdata('admin_satuan')==6){ // setum
+						}elseif($this->session->userdata('admin_jabatan')==2){ // setum
 							if(strpos($b->ka_waka_setum, '2') !== false){ // ka-waka-setum
 								$urlZ = "/setum";
 							}

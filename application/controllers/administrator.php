@@ -553,7 +553,7 @@ class Administrator extends CI_Controller {
                     // var_dump($a['data']);
                     // die();
         }else if($aksi=="add"){
-			if($this->session->userdata('admin_tingkatan') == 1 and $this->session->userdata('admin_satuan') != 6){
+			if($this->session->userdata('admin_tingkatan') == 1 and $this->session->userdata('admin_jabatan') != 2){
 				$surat = $this->db->query("SELECT * FROM surat_keluar")->result();
 			}else if($this->session->userdata('admin_jabatan')== 2 ){
 				$surat = $this->db->query("SELECT * FROM surat_masuk")->result();
@@ -638,7 +638,7 @@ class Administrator extends CI_Controller {
             $a['data']	= $this->db->query("SELECT * FROM notadinas.master_arsip_surat")->result();
             redirect('administrator/master_arsip_surat/m_arsip_surat');
         } else if($aksi=="edit"){
-			if($this->session->userdata('admin_tingkatan') == 1 and $this->session->userdata('admin_satuan') != 6){
+			if($this->session->userdata('admin_tingkatan') == 1 and $this->session->userdata('admin_jabatan') != 2){
 				$surat = $this->db->query("SELECT * FROM surat_keluar")->result();
 			}else if($this->session->userdata('admin_jabatan')== 2 ){
 				$surat = $this->db->query("SELECT * FROM surat_masuk")->result();

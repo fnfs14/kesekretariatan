@@ -74,7 +74,7 @@
 		} else {
 			$no 	= ($this->uri->segment(4) + 1);
 			foreach ($data as $b) {
-				if($b->create_by == $this->session->userdata('admin_id') or (isset($tembusan[$this->session->userdata('admin_jabatan')][$b->id]) and $this->session->userdata('admin_tingkatan')!=2) or $this->session->userdata('admin_jabatan')==1 or $this->session->userdata('admin_jabatan')==28 or $this->session->userdata('admin_satuan')==6){
+				if($b->create_by == $this->session->userdata('admin_id') or (isset($tembusan[$this->session->userdata('admin_jabatan')][$b->id]) and $this->session->userdata('admin_tingkatan')!=2) or $this->session->userdata('admin_jabatan')==1 or $this->session->userdata('admin_jabatan')==28 or $this->session->userdata('admin_jabatan')==2){
 		?>
 		<tr>
 			<td><?= $order_list = $order_list + 1; ?></td>
@@ -130,11 +130,11 @@
 							<a onclick="return confirm('Anda yakin ingin menghapus surat ini?');" href="<?php echo base_URL()?>admin/surat_keluar/delete_new_message/<?php echo $b->id?>" class="btn btn-info btn-sm">Hapus</a>
 							<a href="<?php echo base_URL()?>admin/surat_keluar/kirim_kelain/<?= $b->id?>" class="btn btn-primary btn-sm"> Kirim</a>
 				<?php 
-					}else if($b->status_surat_keluar == 5 and $this->session->userdata('admin_satuan')==6){ 
+					}else if($b->status_surat_keluar == 5 and $this->session->userdata('admin_jabatan')==2){ 
 					echo '
 										<a href="'.base_URL().'admin/surat_keluar/verifikasi_surat_keluar/'.$b->id .'" class="btn btn-success btn-sm"> verifikasi</a>
 									';
-					}else if($b->status_surat_keluar == 4 and $this->session->userdata('admin_satuan')==6){ 
+					}else if($b->status_surat_keluar == 4 and $this->session->userdata('admin_jabatan')==2){ 
 					echo '<a href="' . base_URL() . 'admin/surat_keluar/show/' . $b->id . '" class="btn btn-default btn-sm">Tampil</a>
 										<a href="'.base_URL().'admin/surat_keluar/verifikasi_surat_keluar/'.$b->id .'" class="btn btn-success btn-sm"> Proses</a>
 									';

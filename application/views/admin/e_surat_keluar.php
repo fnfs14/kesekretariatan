@@ -46,7 +46,7 @@ if ($mode == "edt" || $mode == "act_edt" || $mode == "verifikasi_surat_keluar" |
     if ($mode == "verifikasi_surat_keluar") {
         if ($this->session->userdata('admin_jabatan') == 1) {
             $act = 'verifikasi_submit_kapushidrosal/' . $idp;
-        } elseif ($this->session->userdata('admin_satuan') == 6) {
+        } elseif ($this->session->userdata('admin_jabatan') == 2) {
             $act = 'kirim_ke_kapushidrosal/' . $idp;
         } else {
             $act = 'verifikasi_submit/' . $idp;
@@ -70,7 +70,7 @@ if ($mode == "edt" || $mode == "act_edt" || $mode == "verifikasi_surat_keluar" |
     $signature = "";
     $jenis_surat = "";
 }
-if ($this->session->userdata('admin_satuan') == 6) {
+if ($this->session->userdata('admin_jabatan') == 2) {
     $disabled = "";
 } else {
     $disabled = "disabled";
@@ -335,7 +335,7 @@ if ($this->session->userdata('admin_satuan') == 6) {
                                                  class="form-control"><?php echo $ket; ?></textarea></b></td>
                 </tr>
 				
-				<?php if ($mode!="add" and $this->session->userdata('admin_satuan') == 6){ ?>
+				<?php if ($mode!="add" and $this->session->userdata('admin_jabatan') == 2){ ?>
                 <?php if ($datpil->status_surat_keluar == 4) { ?>
                         <tr>
 							<td style="vertical-align: top;">Komentar Kapushidrosal</td>
@@ -347,7 +347,7 @@ if ($this->session->userdata('admin_satuan') == 6) {
 				
 
 
-                <?php //if ($this->session->userdata('admin_satuan') != 6) { ?>
+                <?php //if ($this->session->userdata('admin_jabatan') != 2) { ?>
 
 
                     <tr>
@@ -413,7 +413,7 @@ if ($this->session->userdata('admin_satuan') == 6) {
                                     echo "</td>";
                                     if ($this->session->userdata('admin_id') == $datpil->create_by) {
                                         $tembusan_hidden_show = "";
-										if($this->session->userdata('admin_satuan')==6){
+										if($this->session->userdata('admin_jabatan')==2){
 											$tembusan_hidden_show = "style='display:none;'";											
 										}
                                     } else if ($aa->idnya_jabatan != $this->session->userdata('admin_jabatan')) {

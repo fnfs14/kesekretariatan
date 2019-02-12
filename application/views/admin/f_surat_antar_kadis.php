@@ -17,7 +17,7 @@ if ($mode == "edt" || $mode == "act_edt" || $mode == "verifikasi_surat_antar_kad
 	if($mode == "verifikasi_surat_antar_kadis"){
 		if($this->session->userdata('admin_jabatan')==1){
 			$act = 'verifikasi_submit_kapushidrosal/'.$idp;
-		}elseif($this->session->userdata('admin_satuan')==6){
+		}elseif($this->session->userdata('admin_jabatan')==2){
 			$act = 'verifikasi_submit_setum/'.$idp;
 		}else{
 			$act = 'verifikasi_submit/'.$idp;
@@ -39,7 +39,7 @@ if ($mode == "edt" || $mode == "act_edt" || $mode == "verifikasi_surat_antar_kad
 	$isi_surat	= "";
 	$file_attachment = "";
 }
-if($this->session->userdata('admin_satuan')==6){
+if($this->session->userdata('admin_jabatan')==2){
 	$disabled = "";
 }else{
 	$disabled = "disabled";
@@ -194,7 +194,7 @@ if($this->session->userdata('admin_satuan')==6){
 			<td style="vertical-align: top;">Keterangan</td>
 			<td colspan="4"><b><textarea tabindex="7" name="ket" required style="" rows="5" class="form-control"><?php echo $ket; ?></textarea></b></td>
 		</tr>
-		<?php //if($this->session->userdata('admin_satuan')!=6){ ?>
+		<?php //if($this->session->userdata('admin_jabatan')!=2){ ?>
 		<tr>
 			<td width="20%"><?php if((isset($datpil->create_by) and $datpil->create_by == $this->session->userdata('admin_id')) or $mode == 'add' or $mode == 'verifikasi_surat_antar_kadis'){ ?>Tembusan<?php } ?></td>
 			<td><?php if((isset($datpil->create_by) and $datpil->create_by == $this->session->userdata('admin_id')) or $mode == 'add' or $mode == 'verifikasi_surat_antar_kadis'){ ?>
@@ -321,7 +321,7 @@ if($this->session->userdata('admin_satuan')==6){
 				<?php } ?>
 				<?php }elseif($this->session->userdata('admin_jabatan')==1){
 					
-				}elseif($this->session->userdata('admin_satuan')==6){?>
+				}elseif($this->session->userdata('admin_jabatan')==2){?>
 					<br/><button type="submit" class="btn btn-default" tabindex="10" style="float:right; margin-left:10px;">Simpan</button>
 				<?php } else{?>
 				<br/><a tabindex="11" style="float:right;" class="btn btn-success" id="proses">

@@ -692,13 +692,13 @@ ORDER BY updated_at DESC")->result();
 							abcd($zxc+1,'Surat Keluar',$bl->idnya, $bl->perihal,$newDate,'/surat_keluar/verifikasi_surat_keluar/');
 							$zxc = $zxc + 1;
 							$notif['keluar'][$bl->idnya] = true;
-						}else if($bl->status_surat_keluar==4 and $this->session->userdata('admin_satuan')==6 and $bl->opened==4 and $bl->tujuan_status != 1){
+						}else if($bl->status_surat_keluar==4 and $this->session->userdata('admin_jabatan')==2 and $bl->opened==4 and $bl->tujuan_status != 1){
 							$originalDate = $bl->updated_at;
 							$newDate = date("j M Y H:i", strtotime($originalDate));
 							abcd($zxc+1,'Surat Keluar',$bl->idnya, $bl->perihal,$newDate,'/surat_keluar/verifikasi_surat_keluar/');
 							$zxc = $zxc + 1;
 							$notif['keluar'][$bl->idnya] = true;
-						}else if($bl->status_surat_keluar==5 and $this->session->userdata('admin_satuan')==6 and $bl->opened==5 and $bl->tujuan_status != 1){
+						}else if($bl->status_surat_keluar==5 and $this->session->userdata('admin_jabatan')==2 and $bl->opened==5 and $bl->tujuan_status != 1){
 							$originalDate = $bl->updated_at;
 							$newDate = date("j M Y H:i", strtotime($originalDate));
 							abcd($zxc+1,'Surat Keluar',$bl->idnya, $bl->perihal,$newDate,'/surat_keluar/verifikasi_surat_keluar/');
