@@ -20,7 +20,17 @@
 			</div>
 		<div class="navbar-collapse collapse navbar-inverse-collapse" style="margin-right: -20px">
 			<ul class="nav navbar-nav">
-			<?php if($this->session->userdata('admin_tingkatan') != 2 and $this->session->userdata('admin_jabatan')!=1 and $this->session->userdata('admin_jabatan')!=28){ ?>	<!-- ubah ini -->
+			<?php if(
+				(	$this->session->userdata('admin_tingkatan') != 2
+					and $this->session->userdata('admin_jabatan')!=1
+					and $this->session->userdata('admin_jabatan')!=28
+				)
+				or (
+					$this->session->userdata('admin_jabatan') == 174
+					or $this->session->userdata('admin_jabatan') == 84
+					or $this->session->userdata('admin_jabatan') == 162
+				)
+			){ ?>
 				<li><a href="<?php echo base_URL(); ?>admin/surat_keluar/add" class="btn-info"><i class="icon-plus-sign icon-white"> </i> Tambah Data</a></li>
 			<?php } ?>
 			</ul>
