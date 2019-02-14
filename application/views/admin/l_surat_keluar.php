@@ -20,7 +20,7 @@
 			</div>
 		<div class="navbar-collapse collapse navbar-inverse-collapse" style="margin-right: -20px">
 			<ul class="nav navbar-nav">
-			<?php if($this->session->userdata('admin_tingkatan') != 2){ ?>	<!-- ubah ini -->
+			<?php if($this->session->userdata('admin_tingkatan') != 2 and $this->session->userdata('admin_jabatan')!=1 and $this->session->userdata('admin_jabatan')!=28){ ?>	<!-- ubah ini -->
 				<li><a href="<?php echo base_URL(); ?>admin/surat_keluar/add" class="btn-info"><i class="icon-plus-sign icon-white"> </i> Tambah Data</a></li>
 			<?php } ?>
 			</ul>
@@ -135,7 +135,7 @@
 										<a href="'.base_URL().'admin/surat_keluar/verifikasi_surat_keluar/'.$b->id .'" class="btn btn-success btn-sm"> verifikasi</a>
 									';
 					}else if($b->status_surat_keluar == 4 and $this->session->userdata('admin_jabatan')==2){ 
-					echo '<a href="' . base_URL() . 'admin/surat_keluar/show/' . $b->id . '" class="btn btn-default btn-sm">Tampil</a>
+					echo '
 										<a href="'.base_URL().'admin/surat_keluar/verifikasi_surat_keluar/'.$b->id .'" class="btn btn-success btn-sm"> Proses</a>
 									';
 					}else if($b->status_surat_keluar == 7){ 
@@ -144,25 +144,23 @@
 							<a href="' . base_URL() . 'admin/surat_keluar/show/' . $b->id . '" class="btn btn-default btn-sm">Tampil</a>
 							<a href="#" class="btn btn-success btn-sm"> Selesai</a>';
 					}else{
-						echo '<a href="#diproses" class="btn btn-danger btn-sm">Diproses</a>';
+						echo '<a href="'.base_URL().'admin/surat_keluar/show/'.$b->id.'" class="btn btn-default btn-sm">Tampil</a>';
 					} 
 				} else {
 					// var_dump($b);/*
 					if ($b->status_surat_keluar == 0 or $b->status_surat_keluar == 8) {
 						if ($this->session->userdata("admin_jabatan")==1 or $this->session->userdata("admin_jabatan")==2 or $this->session->userdata("admin_tingkatan")==1) {
-							echo '<a href="#diproses" class="btn btn-danger btn-sm">Diproses</a>';
+							echo '<a href="'.base_URL().'admin/surat_keluar/show/'.$b->id .'" class="btn btn-default btn-sm"> Tampil</a>';
 						}else{
 							echo '<a href="#noaction" class="btn btn-danger btn-sm">No Action</a>';
 						}
 					}else if ($b->status_surat_keluar == 1) {
 						if ($this->session->userdata("admin_jabatan")==1 or $this->session->userdata("admin_jabatan")==2) {
-							echo '<a href="#diproses" class="btn btn-danger btn-sm">Diproses</a>';
-						}else if ($this->session->userdata("admin_tingkatan")==1) {
+							echo '<a href="'.base_URL().'admin/surat_keluar/show/'.$b->id .'" class="btn btn-default btn-sm"> Tampil</a>';
+						}else if ($this->session->userdata("admin_tingkatan")==1 or (isset($tembusan[$this->session->userdata('admin_jabatan')][$b->id]) and $this->session->userdata("admin_tingkatan")==2)) {
 							if(isset($tembusan[$this->session->userdata('admin_jabatan')][$b->id]) and $tembusan[$this->session->userdata('admin_jabatan')][$b->id]==1){
-								echo '<a href="' . base_URL() . 'admin/surat_keluar/show/' . $b->id . '" class="btn btn-default btn-sm">Tampil</a>';
 								if(isset($status_tembusan[$this->session->userdata('admin_jabatan')][$b->id][2]) or isset($status_tembusan[$this->session->userdata('admin_jabatan')][$b->id][1])){
-									echo '<a href="#" class="btn btn-danger btn-sm"> Diproses</a>
-									';
+									echo '<a href="' . base_URL() . 'admin/surat_keluar/show/' . $b->id . '" class="btn btn-default btn-sm">Tampil</a>';									
 								}else{
 									echo '<a href="'.base_URL().'admin/surat_keluar/verifikasi_surat_keluar/'.$b->id .'" class="btn btn-success btn-sm"> verifikasi</a>
 									';
@@ -175,7 +173,7 @@
 						}
 					}else if ($b->status_surat_keluar == 2) {
 						if ($this->session->userdata("admin_jabatan")==$b->kirim_ke) {
-							echo '<a href="' . base_URL() . 'admin/surat_keluar/show/' . $b->id . '" class="btn btn-default btn-sm">Tampil</a>
+							echo '
 										<a href="'.base_URL().'admin/surat_keluar/verifikasi_surat_keluar/'.$b->id .'" class="btn btn-success btn-sm"> verifikasi</a>
 									';
 						}else if($this->session->userdata("admin_jabatan")== 1){
@@ -184,24 +182,23 @@
 									';
 						}
 						else if ($this->session->userdata("admin_tingkatan")==1 or $this->session->userdata("admin_jabatan")==2) {
-							echo '<a href="#diproses" class="btn btn-danger btn-sm">Diproses</a>';
+							echo '<a href="'.base_URL().'admin/surat_keluar/show/'.$b->id .'" class="btn btn-default btn-sm"> Tampil</a>';
 						}else{
 							echo '<a href="#noaction" class="btn btn-danger btn-sm">No Action</a>';
 						}
 					}else if ($b->status_surat_keluar == 3) {
 						if ($this->session->userdata("admin_tingkatan")==1 or $this->session->userdata("admin_jabatan")==1 or $this->session->userdata("admin_jabatan")==2) {
-							echo '<a href="#diproses" class="btn btn-danger btn-sm">Diproses</a>';
 							echo '<a href="'.base_URL().'admin/surat_keluar/show/'.$b->id .'" class="btn btn-default btn-sm"> Tampil</a>';
 						}else{
 							echo '<a href="#noaction" class="btn btn-danger btn-sm">No Action</a>';
 						}
 					}else if ($b->status_surat_keluar == 4) {
 						if ($this->session->userdata("admin_jabatan")==2) {
-							echo '<a href="' . base_URL() . 'admin/surat_keluar/show/' . $b->id . '" class="btn btn-default btn-sm">Tampil</a>
+							echo '
 										<a href="'.base_URL().'admin/surat_keluar/verifikasi_surat_keluar/'.$b->id .'" class="btn btn-success btn-sm"> Proses</a>
 									';										   
 						}else if ($this->session->userdata("admin_tingkatan")==1 or $this->session->userdata("admin_jabatan")==$b->kirim_ke) {
-							echo '<a href="#diproses" class="btn btn-danger btn-sm">Diproses</a>';
+							echo '<a href="'.base_URL().'admin/surat_keluar/show/'.$b->id .'" class="btn btn-default btn-sm"> Tampil</a>';
 						}else{
 							echo '<a href="#noaction" class="btn btn-danger btn-sm">No Action</a>';
 						}
@@ -211,7 +208,6 @@
 										<a href="'.base_URL().'admin/surat_keluar/verifikasi_surat_keluar/'.$b->id .'" class="btn btn-success btn-sm"> verifikasi</a>
 									';
 						}else if ($this->session->userdata("admin_tingkatan")==1 or $this->session->userdata("admin_jabatan")==1) {
-							echo '<a href="#diproses" class="btn btn-danger btn-sm">Diproses</a>';
 							echo '<a href="'.base_URL().'admin/surat_keluar/show/'.$b->id .'" class="btn btn-default btn-sm"> Tampil</a>';
 						}else{
 							echo '<a href="#noaction" class="btn btn-danger btn-sm">No Action</a>';
@@ -221,15 +217,14 @@
 							echo '<a href="' . base_URL() . 'admin/surat_keluar/show/' . $b->id . '" class="btn btn-default btn-sm">Tampil</a>
 							<a href="'.base_URL().'admin/surat_keluar/verifikasi_surat_keluar/'.$b->id .'" class="btn btn-success btn-sm"> Proses</a>';
 						}else if ($this->session->userdata("admin_tingkatan")==1 or $this->session->userdata("admin_jabatan")==1) {
-							echo '<a href="#diproses" class="btn btn-danger btn-sm">Diproses</a>';
+							echo '<a href="'.base_URL().'admin/surat_keluar/show/'.$b->id .'" class="btn btn-default btn-sm"> Tampil</a>';
 						}else{
 							echo '<a href="#noaction" class="btn btn-danger btn-sm">No Action</a>';
 						}
 					}else if ($b->status_surat_keluar == 7) {
 							echo '
 							<a target="_blank" href="'. base_URL(); ?>admin/cetak_surat_keluar/<?= $b->id . '" class="btn btn-success btn-sm"> Cetak</a>
-							<a href="' . base_URL() . 'admin/surat_keluar/show/' . $b->id . '" class="btn btn-default btn-sm">Tampil</a>
-							<a href="#" class="btn btn-success btn-sm"> Selesai</a>';
+							<a href="' . base_URL() . 'admin/surat_keluar/show/' . $b->id . '" class="btn btn-default btn-sm">Tampil</a>';
 					}
 					//*/
 				} ?>

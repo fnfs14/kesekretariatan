@@ -1750,7 +1750,7 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
         }
 		var abcd = $("#jenis_surat").val();
 		// alert(abcd);
-		 $.get('<?php echo base_url().'admin/ambiltugas/' ?>',{ abcd:abcd},function(data){
+		 $.get('<?php echo base_url().'admin/ambiltugas/' ?>',{ abcd:abcd, selected:<?= $datpil->id_taks; ?>},function(data){
               console.log(data);
               // alert(nofi);
              $('#listtugas').html(data);
@@ -1793,4 +1793,6 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
 		}
 	});
 	$(".checkedCheckbox:checked").css('outline','#194896 solid 1px');
+	
+	ganti(<?= $datpil->id_jenis_surat_masuk; ?>);
 </script>

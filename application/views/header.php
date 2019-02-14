@@ -529,18 +529,17 @@
 		if ($this->session->userdata('admin_level') != "Super Admin") {
 		?>
 		<li class="dropdown">
-	          <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes"><i class="icon-list-alt icon-white"> </i> Nota Dinas <span class="caret"></span></a>
+	          <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes"><i class="icon-list-alt icon-white"> </i> Surat Antar Satker <span class="caret"></span></a>
 	          <ul class="dropdown-menu" aria-labelledby="themes">
-			        <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/master_kegiatan/m_kegiatan">Master Kegiatan</a></li>
-	            <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/nota_dinas/nota_dinas">Pengaturan Permohonan</a></li>
-				<li><a tabindex="-1" href="<?php echo base_url(); ?>admin/manage_ruangkrj/m_ruangkrj">Pengaturan Ruang Kerja</a></li>
-	            <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/manage_task/m_task">Pengaturan Tugas</a></li>
-	            <!-- popo -->
+	            <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/nota_dinas/nota_dinas">Pembuatan Surat</a></li>
 	            <?php if($this->session->userdata('admin_jabatan') == 1 || $this->session->userdata('admin_jabatan') == 28) { ?>
 	            <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/manage_ruangkrj/m_ruangkrj">Pengaturan Ruang Kerja</a></li>
 	            <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/manage_task/m_task">Pengaturan Tugas</a></li><!--ubah mei bahasa-->
 	           <?php } ?>
 	            <?php if($this->session->userdata('admin_jabatan') == 2 ) { ?>
+				<li><a tabindex="-1" href="<?php echo base_url(); ?>admin/manage_ruangkrj/m_ruangkrj">Pengaturan Ruang Kerja</a></li>
+	            <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/manage_task/m_task">Pengaturan Tugas</a></li>
+				 <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/master_kegiatan/m_kegiatan">Master Kegiatan</a></li>
 	            	 <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/master_ruang/m_ruang">Pengaturan Ruangan</a></li>
 	            <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/master_lemari/m_lemari">Pengaturan Lemari</a></li>
 	            <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/master_rak/m_rak">Pengaturan Rak</a></li>
@@ -649,8 +648,8 @@ ORDER BY updated_at DESC")->result();
 			  <li class="divider-notification"></li>
 			  <li><table width='100%' style='background:white;' cellpadding='5px'>
 			  <?php
-			  function abcd($no,$what,$id,$perihal,$updated_at,$link,$req=NULL,$button=NULL){//ubah mei notifikasi
-				$result = '<tr style="font-size:12px;margin-top:0px;padding-top:0px;">
+			  function abcd($no,$what,$id,$perihal,$updated_at,$link,$req=NULL){//ubah mei notifikasi
+				echo '<tr style="font-size:12px;margin-top:0px;padding-top:0px;">
 				<td style="border:1px solid;border-color:white;border-bottom-color:lightgrey;" width="5%">
 				<span class="badge" style="margin-top:0px;">'.$no.'</span></td>
 				<td style="border:1px solid white;border-bottom-color:lightgrey;" width="35%"><span style="font-size:0.8em;height:10px;position:static;top:0px;margin:0px;color:magenta">'.$updated_at.'</span></td>
@@ -658,18 +657,9 @@ ORDER BY updated_at DESC")->result();
 				'.$what.'</td>
 				<td style="border:1px solid;border-color:white;border-bottom-color:lightgrey;padding-top:0px;padding-bottom:0px;margin-bottom:0px;margin-top:0px;" width="20%">
 				'.$perihal.'</td>
-				<td style="border:1px solid;border-color:white;border-bottom-color:lightgrey;padding-top:0px;padding-bottom:0px;margin-bottom:0px;margin-top:0px;" width="10%">';
-				if($button!=NULL){
-					$result .= "<a class='btn btn-info btn-sm' ";
-					$result .= 'onclick="bacasatuan('.$id.','."'$button'".')">Buka</a>';
-					
-				}else{
-					$result .= '<a class="btn btn-info btn-sm" href="'.base_url().'admin'. $link . $id . "/" . $req . '">Buka</a>';
-				}
-				$result .= '
-				</td>
+				<td style="border:1px solid;border-color:white;border-bottom-color:lightgrey;padding-top:0px;padding-bottom:0px;margin-bottom:0px;margin-top:0px;" width="10%">
+				<a class="btn btn-info btn-sm" href="'.base_url().'admin'. $link . $id . "/" . $req . '">Buka</a></td>
 				</tr>';
-				echo $result;
 			  }
 			  $zxc = 0;
 			  $notif = [];
@@ -758,13 +748,9 @@ ORDER BY updated_at DESC")->result();
 							$zxc = $zxc + 1;
 							$notif['masuk'][$bl->idnya] = true;
 						}else if($bl->status_surat_keluar==3 and $this->session->userdata('admin_jabatan')==$bl->id_jabatan and $bl->status==1 and $bl->opened==3){
-							$headerButton = NULL;
-							if($this->session->userdata('admin_tingkatan')==2){
-								$headerButton = 'kadisp';
-							}
 							$originalDate = $bl->updated_at;
 							$newDate = date("j M Y H:i", strtotime($originalDate));
-							abcd($zxc+1,"Surat Masuk",$bl->idnya, $bl->perihal,$newDate,'/surat_masuk/kadisp/',NULL,$headerButton);
+							abcd($zxc+1,"Surat Masuk",$bl->idnya, $bl->perihal,$newDate,'/surat_masuk/kadisp/');
 							$zxc = $zxc + 1;
 							$notif['masuk'][$bl->idnya] = true;
 						} else if($bl->status_surat_keluar==4 and $this->session->userdata('admin_jabatan')==$bl->id_jabatan and $bl->status==1){
@@ -974,6 +960,23 @@ ORDER BY updated_at DESC")->result();
 			// });
 		  // });
 		});
+		
+		
+function baca(e,j) {	
+	$.get('<?= base_url()."administrator/baca_feedback" ?>',{id:e},function (data) {
+		window.location.assign("<?php echo base_url();?>admin/surat_masuk/"+j+"/"+e);
+	})
+}
+function bacasatuan(e,j) {
+	$.get('<?= base_url()."administrator/baca_feedback_satuan" ?>',{id:e},function (data) {
+		window.location.assign("<?php echo base_url();?>admin/surat_masuk/"+j+"/"+e);
+	})
+}
+function bacaKadis(e,j) {
+	$.get('<?= base_url()."administrator/baca_feedback_kadis" ?>',{id:e},function (data) {
+		window.location.assign("<?php echo base_url();?>admin/surat_masuk/"+j+"/"+e);
+	})
+}
 
 		function addNewRowNotification($type, $id, $perihal,$updated_at, $link, $req = null){
 			$tipe = '';

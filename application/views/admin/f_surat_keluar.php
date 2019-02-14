@@ -427,7 +427,7 @@ if ($this->session->userdata('admin_jabatan') == 2) {
                 </script>
                 <tr>
                     <td style="vertical-align: top;">Keterangan</td>
-                    <td colspan="4"><b><textarea tabindex="7" name="ket" required style="" rows="5"
+                    <td colspan="4"><b><textarea tabindex="7" name="ket"  style="" rows="5"
                                                  class="form-control"><?php echo $ket; ?></textarea></b></td>
                 </tr>
 
@@ -882,10 +882,12 @@ if ($this->session->userdata('admin_jabatan') == 2) {
                                     onclick="document.getElementById('signatureJSON').value = document.getElementById('signatureJSON').value.replace('data:image/png;base64,','');">
                                 Setuju
                             </button> -->
+							<?php if($mode!='show'){ ?>
                             <button type="submit" tabindex="11" style="float:right;margin-left:10px;"
                                     class="btn btn-success" >
                                 Setuju
                             </button>
+							<?php } ?>
     </form>
     <form action="<?php echo base_URL() ?>admin/surat_keluar/<?php echo $act; ?>" method="post" accept-charset="utf-8"
           enctype="multipart/form-data" id="formnya">
