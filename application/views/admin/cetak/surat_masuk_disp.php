@@ -6,6 +6,7 @@
 		<td style="text-align: left; text-decoration: none">YTH. <label><?php echo $jabatan->nama_jabatan; ?></label></td>
 	</tr>
 </table>
+<div style="<?=$checkSubdis;?>">
 <table id="fourth" style="font-size: 11px; border-collapse: collapse;">
 	<tr>
 		<td>
@@ -210,3 +211,4 @@ $get = $this->db->query('SELECT * FROM notadinas.disposisi_surat_masuk WHERE not
 		</td>
 	</tr>
 </table>
+</div>

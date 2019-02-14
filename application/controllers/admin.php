@@ -736,6 +736,17 @@ ORDER BY updated_at DESC")->result();
 		WHERE notadinas.surat_masuk.id = $idb")->row();
         $this->load->view('admin/cetak/surat_masuk', $a);
 		
+		$checkSubdis = "";
+		if($this->session->userdata('admin_tingkatan')==2){			
+			$checkSubdisQ = $this->cetakCondition($this->session->userdata('admin_satuan'),$idb);
+			if(
+				isset($checkSubdisQ[$this->session->userdata('admin_jabatan')])
+				and $checkSubdisQ[$this->session->userdata('admin_jabatan')]==true
+			){
+				$checkSubdis = "display:none;";
+			}
+		}
+		$disp['checkSubdis'] = $checkSubdis;
 		$disp['alamat_aksi'] = $this->getSelectedJabatan();	
 		$disp['aksi'] = $this->db->query('SELECT * FROM notadinas.master_aksi ORDER BY id ASC')->result();
 		$disp['idbut'] = $idb;
@@ -762,6 +773,7 @@ ORDER BY updated_at DESC")->result();
 				)->row();
 				$idJabatan = $data->id;
 			}
+			$kadisp['checkSubdis'] = $checkSubdis;
 			$kadisp['aksinya'] = $disp['aksi'];
 			$kadisp['alamat_aksi_sub'] = $this->db->query("
 				SELECT 
@@ -5362,9 +5374,48 @@ ORDER BY updated_at DESC")->result();
        echo $valid;
     }
 	public function test(){
-		$TemBusanz = $this->db->query("SELECT * FROM notadinas.tembusan_nota_dinas WHERE id_notadinas = 2 AND id_jabatan = 6")->row();
-		echo $TemBusanz->id_jabatan;
-		$this->dd($TemBusanz);
+		
+	}
+	public function cetakCondition($satuan,$surat){
+		$kadis = $this->db->query("
+			SELECT u.*
+			FROM notadinas.master_jabatan as j
+			INNER JOIN notadinas.master_user as u
+				ON u.jabatan = j.id
+			WHERE
+				j.tingkatan = 1
+				AND j.satuan = $satuan
+		")->result();
+		$tembusan = [];
+		foreach($kadis as $k){
+			$subdis = $this->db->query("
+				SELECT 
+					a.id
+				FROM notadinas.master_jabatan as a
+				INNER JOIN notadinas.master_subjabatan as b
+					ON a.subdis = b.id_subjabatan
+				INNER JOIN notadinas.master_jabatan as c
+					ON b.id_jabatan = c.id
+				WHERE
+					b.id_jabatan = '$k->id'
+					AND
+					a.tingkatan = 2
+			")->result();
+			foreach($subdis as $s){
+				$query = $this->db->query("
+					SELECT *
+					FROM notadinas.log_proses_surat_masuk
+					WHERE
+						id_suratmasuk = $surat
+						AND pengirim = $k->id
+						AND penerima = $s->id
+				")->row();
+				if($query!=NULL){					
+					$tembusan[$s->id] = true;
+				}
+			}
+		}
+		return $tembusan;
 	}
 	
 	function getabx(){
