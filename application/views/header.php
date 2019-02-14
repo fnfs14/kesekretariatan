@@ -976,7 +976,7 @@ function bacaKadis(e,j) {
 	$.get('<?= base_url()."administrator/baca_feedback_kadis" ?>',{id:e},function (data) {
 		window.location.assign("<?php echo base_url();?>admin/surat_masuk/"+j+"/"+e);
 	})
-}
+} 
 
 		function addNewRowNotification($type, $id, $perihal,$updated_at, $link, $req = null){
 			$tipe = '';
