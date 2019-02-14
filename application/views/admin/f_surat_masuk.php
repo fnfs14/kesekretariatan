@@ -1046,7 +1046,11 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
     </div>
 
   
-    <?php if($act != "subdisp" or $checkJabatan->tingkatan==2){ ?>
+    <?php if(
+			$act != "subdisp"
+			or $checkJabatan->tingkatan==2
+			or isset($checkSelectedJabatan[$this->session->userdata('admin_jabatan')])
+		){ ?>
      <div class="row-fluid well" style="overflow: hidden">
         <div class="navbar navbar-inverse">
             <div class="container z0">
@@ -1159,7 +1163,10 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
 				or $this->session->userdata('admin_jabatan')==84
 				or $this->session->userdata('admin_jabatan')==162
 				)
-			and !isset($checkSelectedJabatan[$this->session->userdata('admin_tingkatan')])
+			and (
+				isset($checkSelectedJabatan[$this->session->userdata('admin_jabatan')])
+				and $checkSelectedJabatan[$this->session->userdata('admin_jabatan')] == 2
+				)
 			)
 	){ ?>
         <?php // }else if(isset($InfoOrAksi) and $InfoOrAksi->jenis=="INFORMASI"){ ?>
