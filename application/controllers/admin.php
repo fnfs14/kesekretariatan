@@ -2041,6 +2041,12 @@ ORDER BY updated_at DESC")->result();
 				$this->db->query("UPDATE notadinas.surat_keluar SET file_attachment = '" . $fileznya . "', updated_at = '$upd_date' WHERE id = $ids");
             }
 			$this->db->query("UPDATE notadinas.surat_keluar SET tgl_surat = '$tgl_surat', no_surat = '$no_surat', perihal = '$perihal', keterangan = '$ket', isi = '$isi_surat', create_by = '" . $this->session->userdata('admin_id') . "', kepada = '$dari', klasifikasi = '" . $this->input->post('klasifikasi') . "', derajat = '" . $this->input->post('derajat') . "', dari = '" . $this->session->userdata('admin_id') . "', signature = '', jenis_surat = '" . $jenis_surat . "', no_agenda = '".$no_agen."', updated_at = '$upd_date' WHERE id = $ids");
+			
+			
+            $lpskid = $this->db->query("SELECT MAX(id) AS qwe FROM notadinas.log_proses_surat_keluar")->row();
+            $lpskids = $lpskid->qwe + 1;
+            $cc = $this->db->query("SELECT * FROM notadinas.surat_keluar WHERE id = '" . $idp . "'")->row();
+            $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idp . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','6','')");
 
             $this->session->set_flashdata("k", "<div class=\"alert alert-success\" id=\"alert\">Data has been updated</div>");
 
@@ -2201,10 +2207,10 @@ ORDER BY updated_at DESC")->result();
             $cc = $this->db->query("SELECT * FROM notadinas.surat_keluar WHERE id = '" . $idu . "'")->row();
             if ($this->upload->do_upload('file_revisi')) {
                 $up_data = $this->upload->data();               
-                $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','1','" . $this->input->post('komentar_setum') . "','" . $up_data['file_name'] . "')");
+                $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','7','" . $this->input->post('komentar_setum') . "','" . $up_data['file_name'] . "')");
 
             } else {
-                $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','1','" . $this->input->post('komentar') . "')");
+                $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','7','" . $this->input->post('komentar') . "')");
             }
             $this->db->query("UPDATE notadinas.tembusan_surat_keluar SET status = 0 WHERE id_surat_keluar = $idu");
             $mail_2 = $this->db->query("SELECT * FROM notadinas.master_user WHERE id = $cc->create_by")->result();
@@ -2333,7 +2339,7 @@ ORDER BY updated_at DESC")->result();
             $lpskid = $this->db->query("SELECT MAX(id) AS qwe FROM notadinas.log_proses_surat_keluar")->row();
             $lpskids = $lpskid->qwe + 1;
             $cc = $this->db->query("SELECT * FROM notadinas.surat_keluar WHERE id = '" . $idu . "'")->row();
-            $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','1','" . $this->input->post('komentar_kapushidrosal') . "')");
+            $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','7','" . $this->input->post('komentar_kapushidrosal') . "')");
             $this->db->query("UPDATE notadinas.surat_keluar SET status_surat_keluar = 3, opened = 3, updated_at = '$upd_date' WHERE id = $idu");
             $this->db->query("UPDATE notadinas.tembusan_surat_keluar SET status = 0 WHERE id_surat_keluar = $idu");
             $mail_2 = $this->db->query("SELECT * FROM notadinas.master_user WHERE id = $cc->create_by")->result();
@@ -2432,7 +2438,7 @@ ORDER BY updated_at DESC")->result();
             } else {
                 $this->db->query("UPDATE notadinas.surat_keluar SET status_surat_keluar = 8, opened = 88, updated_at = '$upd_date' WHERE id = $idu");
                 $this->db->query("UPDATE notadinas.tembusan_surat_keluar SET status = 0, tanggal = NULL WHERE id_surat_keluar = $idu");
-                $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','1','')");
+                $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','7','')");
 				$userZ = $this->db->query("SELECT * FROM notadinas.master_user WHERE id = $cc->create_by")->row();
 				$this->pushFirebase($userZ->jabatan);
 				// $this->dd($userZ->jabatan); // qaz
