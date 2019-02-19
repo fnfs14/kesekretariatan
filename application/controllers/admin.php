@@ -3569,10 +3569,12 @@ ORDER BY updated_at DESC")->result();
             $year = "/" . $this->angka_romawi(date('n')) . "/" . date('Y');
             $b = $this->db->query("SELECT * FROM notadinas.nota_dinas WHERE no_surat LIKE '%$year';")->result();
             $c = 0;
+			$bc = 0;
             foreach ($b as $d) {
                 $e = explode('/', $d->no_surat);
                 if ($e[1] > $c) {
                     $c = $e[1];
+					$bc++;
                 }
             }
             if (!ctype_digit($c)) {
@@ -3582,7 +3584,8 @@ ORDER BY updated_at DESC")->result();
             // var_dump($matches);
             // die();
             }
-            $max = $c+1;
+			// echo $c."asdasdasd";die();
+            $max = $bc + 1;
             }else{
 
             $max = $c+1;
@@ -3635,7 +3638,7 @@ ORDER BY updated_at DESC")->result();
                 $k = floatval($dt) + 1;
                 $no_urut = str_pad($k, 4, "0", STR_PAD_LEFT);
             }
-            $no_agn = "ND/".$no_urut."".$year;
+            $no_agn = "SS/".$no_urut."".$year;
             $jabatan = $this->input->post('jabatan');
             $keterangan_tembusan = $this->input->post('keterangan_tembusan');
 

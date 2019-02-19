@@ -136,7 +136,7 @@ if($this->session->userdata('admin_jabatan')==2){
     </div>
 </div>
 	<form action="<?php echo base_URL()?>admin/nota_dinas/<?php echo $act; ?>" method="post" accept-charset="utf-8" enctype="multipart/form-data" id="formnya">
-	
+	<?php // echo $act; ?>
 	<input type="hidden" name="idp" value="<?php echo $idp; ?>">
 	
 	<div class="row-fluid well" style="overflow: hidden">
@@ -435,8 +435,8 @@ if($this->session->userdata('admin_jabatan')==2){
 					method: 'post',
 					url:"<?php echo base_url(); ?>admin/generate_filename",
 					success: function(result) {
-						$("#no_lampiran").attr("value","ND-" + result + "-" + roman + "-" + a.getFullYear());
-						$("#cetak_no_lampiran").attr("href","<?php echo base_URL(); ?>admin/cetak_no_lampiran/ND/" + result + "/" + roman + "/" + a.getFullYear());
+						$("#no_lampiran").attr("value","SS-" + result + "-" + roman + "-" + a.getFullYear());
+						$("#cetak_no_lampiran").attr("href","<?php echo base_URL(); ?>admin/cetak_no_lampiran/SS/" + result + "/" + roman + "/" + a.getFullYear());
 					},
 			        error: function(){
 			            alert("Terjadi Kesalahan");
@@ -773,10 +773,13 @@ echo '<a href="'.base_URL().'admin/nota_dinas" tabindex="11" style="float:right;
 					});
 					<?php if($mode=="add"){ ?>
 					$('#proses').click(function(){
+					
 						var validate_perihal = validate($("textarea[name='perihal']").val());
 						var validate_isi = validate($("textarea[name='isi']").val());
 						var validate_ket = validate($("textarea[name='ket']").val());
-
+						if($("input[name='tgl_surat']").val()==""){
+							alert("Harap isi Tanggal Surat");
+						}else{
 						if($("textarea[name='perihal']").val()==""){
 							alert("Harap isi perihal");
 						}else if(document.getElementById("filenya").files.length==0){
@@ -810,7 +813,8 @@ echo '<a href="'.base_URL().'admin/nota_dinas" tabindex="11" style="float:right;
 							});
 							$('#formnya').submit();
 						}
-					});
+						}}
+					);
 					<?php } ?>
 				</script>
 				<?php } ?>
