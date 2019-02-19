@@ -1046,11 +1046,7 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
     </div>
 
   
-    <?php if(
-			$act != "subdisp"
-			or $checkJabatan->tingkatan==2
-			or isset($checkSelectedJabatan[$this->session->userdata('admin_jabatan')])
-		){ ?>
+    <?php if($act != "subdisp" or $checkJabatan->tingkatan==2){ ?>
      <div class="row-fluid well" style="overflow: hidden">
         <div class="navbar navbar-inverse">
             <div class="container z0">
@@ -1163,10 +1159,7 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
 				or $this->session->userdata('admin_jabatan')==84
 				or $this->session->userdata('admin_jabatan')==162
 				)
-			and (
-				isset($checkSelectedJabatan[$this->session->userdata('admin_jabatan')])
-				and $checkSelectedJabatan[$this->session->userdata('admin_jabatan')] == 2
-				)
+			and !isset($checkSelectedJabatan[$this->session->userdata('admin_tingkatan')])
 			)
 	){ ?>
         <?php // }else if(isset($InfoOrAksi) and $InfoOrAksi->jenis=="INFORMASI"){ ?>
@@ -1757,7 +1750,7 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
         }
 		var abcd = $("#jenis_surat").val();
 		// alert(abcd);
-		 $.get('<?php echo base_url().'admin/ambiltugas/' ?>',{ abcd:abcd},function(data){
+		 $.get('<?php echo base_url().'admin/ambiltugas/' ?>',{ abcd:abcd, selected:<?= $datpil->id_taks; ?>},function(data){
               console.log(data);
               // alert(nofi);
              $('#listtugas').html(data);
@@ -1800,4 +1793,6 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
 		}
 	});
 	$(".checkedCheckbox:checked").css('outline','#194896 solid 1px');
+	
+	ganti(<?= $datpil->id_jenis_surat_masuk; ?>);
 </script>

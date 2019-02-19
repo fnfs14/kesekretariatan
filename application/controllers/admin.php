@@ -736,6 +736,17 @@ ORDER BY updated_at DESC")->result();
 		WHERE notadinas.surat_masuk.id = $idb")->row();
         $this->load->view('admin/cetak/surat_masuk', $a);
 		
+		$checkSubdis = "";
+		if($this->session->userdata('admin_tingkatan')==2){			
+			$checkSubdisQ = $this->cetakCondition($this->session->userdata('admin_satuan'),$idb);
+			if(
+				isset($checkSubdisQ[$this->session->userdata('admin_jabatan')])
+				and $checkSubdisQ[$this->session->userdata('admin_jabatan')]==true
+			){
+				$checkSubdis = "display:none;";
+			}
+		}
+		$disp['checkSubdis'] = $checkSubdis;
 		$disp['alamat_aksi'] = $this->getSelectedJabatan();	
 		$disp['aksi'] = $this->db->query('SELECT * FROM notadinas.master_aksi ORDER BY id ASC')->result();
 		$disp['idbut'] = $idb;
@@ -762,6 +773,7 @@ ORDER BY updated_at DESC")->result();
 				)->row();
 				$idJabatan = $data->id;
 			}
+			$kadisp['checkSubdis'] = $checkSubdis;
 			$kadisp['aksinya'] = $disp['aksi'];
 			$kadisp['alamat_aksi_sub'] = $this->db->query("
 				SELECT 
@@ -1959,6 +1971,9 @@ ORDER BY updated_at DESC")->result();
         $config['upload_path'] = './upload/surat_keluar';
         $config['allowed_types'] = '*';
         $config['file_name'] = $this->input->post('no_lampiran');
+		if($mau_ke == "verifikasi_submit_setum"){
+			$config['file_name'] = "rev_sk_" . $this->input->post("ids");
+		}
         // $config['max_size']          = '2000';
         // $config['max_width']         = '3000';
         // $config['max_height']        = '3000';
@@ -2026,6 +2041,12 @@ ORDER BY updated_at DESC")->result();
 				$this->db->query("UPDATE notadinas.surat_keluar SET file_attachment = '" . $fileznya . "', updated_at = '$upd_date' WHERE id = $ids");
             }
 			$this->db->query("UPDATE notadinas.surat_keluar SET tgl_surat = '$tgl_surat', no_surat = '$no_surat', perihal = '$perihal', keterangan = '$ket', isi = '$isi_surat', create_by = '" . $this->session->userdata('admin_id') . "', kepada = '$dari', klasifikasi = '" . $this->input->post('klasifikasi') . "', derajat = '" . $this->input->post('derajat') . "', dari = '" . $this->session->userdata('admin_id') . "', signature = '', jenis_surat = '" . $jenis_surat . "', no_agenda = '".$no_agen."', updated_at = '$upd_date' WHERE id = $ids");
+			
+			
+            $lpskid = $this->db->query("SELECT MAX(id) AS qwe FROM notadinas.log_proses_surat_keluar")->row();
+            $lpskids = $lpskid->qwe + 1;
+            $cc = $this->db->query("SELECT * FROM notadinas.surat_keluar WHERE id = '" . $idp . "'")->row();
+            $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idp . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','6','')");
 
             $this->session->set_flashdata("k", "<div class=\"alert alert-success\" id=\"alert\">Data has been updated</div>");
 
@@ -2069,7 +2090,9 @@ ORDER BY updated_at DESC")->result();
 			if($a['datpil']->status_surat_keluar==8 and $a['datpil']->opened==88 and $a['datpil']->create_by==$this->session->userdata('admin_id')){
 				$this->db->query("UPDATE notadinas.surat_keluar SET opened = 89, updated_at = '$upd_date' WHERE id = '$idu'");
 			}
+			$this->pushFirebase($this->session->userdata('admin_jabatan'));
         }else if ($mau_ke == "delete_new_message") {
+			$this->db->query("DELETE FROM notadinas.feedback_surat_keluar WHERE id_surat_keluar = $idu");
             $this->db->query("DELETE FROM notadinas.tembusan_surat_keluar WHERE id_surat_keluar = $idu");
             $this->db->query("DELETE FROM notadinas.log_proses_surat_keluar WHERE id_suratkeluar = $idu");
             $this->db->query("DELETE FROM notadinas.surat_keluar WHERE id = $idu");
@@ -2108,6 +2131,7 @@ ORDER BY updated_at DESC")->result();
             ];
 
             $_SESSION['socketNotif'] = $socketData;
+			$this->pushFirebase($this->session->userdata('admin_jabatan'));
             redirect(base_url() . 'admin/surat_keluar');
             //popo
         } else if ($mau_ke == "tambah_tujuan") {
@@ -2171,6 +2195,7 @@ ORDER BY updated_at DESC")->result();
             ];
 
             $_SESSION['socketNotif'] = $socketData;
+			$this->pushFirebase('1,28');
             echo "Sukses";
             die();
             // redirect(base_url() . 'admin/surat_keluar');
@@ -2182,10 +2207,10 @@ ORDER BY updated_at DESC")->result();
             $cc = $this->db->query("SELECT * FROM notadinas.surat_keluar WHERE id = '" . $idu . "'")->row();
             if ($this->upload->do_upload('file_revisi')) {
                 $up_data = $this->upload->data();               
-                $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','1','" . $this->input->post('komentar_setum') . "','" . $up_data['file_name'] . "')");
+                $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','7','" . $this->input->post('komentar_setum') . "','" . $up_data['file_name'] . "')");
 
             } else {
-                $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','1','" . $this->input->post('komentar') . "')");
+                $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','7','" . $this->input->post('komentar') . "')");
             }
             $this->db->query("UPDATE notadinas.tembusan_surat_keluar SET status = 0 WHERE id_surat_keluar = $idu");
             $mail_2 = $this->db->query("SELECT * FROM notadinas.master_user WHERE id = $cc->create_by")->result();
@@ -2217,6 +2242,8 @@ ORDER BY updated_at DESC")->result();
             ];
 
             $_SESSION['socketNotif'] = $socketData;
+			$createBy = $this->db->query("SELECT * FROM notadinas.master_user WHERE id = $cc->create_by")->row();
+			$this->pushFirebase($createBy->jabatan);
 
             redirect(base_url() . 'admin/surat_keluar');
         } else if ($mau_ke == "verifikasi_submit_kapushidrosal_setuju") {
@@ -2298,6 +2325,12 @@ ORDER BY updated_at DESC")->result();
 
             $_SESSION['socketNotif'] = $socketData;
             
+			$data = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE satuan = 6 and tingkatan = 1")->result();
+			$az = "";
+			foreach($data as $a){
+				$az .= "$a->id,";
+			}
+			$this->pushFirebase($az);
                 redirect(base_url() . 'admin/surat_keluar');
         } else if ($mau_ke == "verifikasi_submit_kapushidrosal") {
             // die($cc->kepada);
@@ -2306,7 +2339,7 @@ ORDER BY updated_at DESC")->result();
             $lpskid = $this->db->query("SELECT MAX(id) AS qwe FROM notadinas.log_proses_surat_keluar")->row();
             $lpskids = $lpskid->qwe + 1;
             $cc = $this->db->query("SELECT * FROM notadinas.surat_keluar WHERE id = '" . $idu . "'")->row();
-            $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','1','" . $this->input->post('komentar_kapushidrosal') . "')");
+            $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','7','" . $this->input->post('komentar_kapushidrosal') . "')");
             $this->db->query("UPDATE notadinas.surat_keluar SET status_surat_keluar = 3, opened = 3, updated_at = '$upd_date' WHERE id = $idu");
             $this->db->query("UPDATE notadinas.tembusan_surat_keluar SET status = 0 WHERE id_surat_keluar = $idu");
             $mail_2 = $this->db->query("SELECT * FROM notadinas.master_user WHERE id = $cc->create_by")->result();
@@ -2336,6 +2369,8 @@ ORDER BY updated_at DESC")->result();
                 'create_by'           => $cc->create_by
             ];
 
+			$createBy = $this->db->query("SELECT * FROM notadinas.master_user WHERE id = $cc->create_by")->row();
+			$this->pushFirebase($createBy->jabatan);
             $_SESSION['socketNotif'] = $socketData;
             redirect(base_url() . 'admin/surat_keluar');
         } else if ($mau_ke == "verifikasi_submit") {
@@ -2394,10 +2429,19 @@ ORDER BY updated_at DESC")->result();
                 foreach ($mail_2 as $b) {
                     $ok = @mail($b->email, "Disposisi Surat Keluar", "Diterima surat keluar baru untuk ditindak lanjuti, dengan perihal $cc->perihal .", "From: pushidrosal.mail@gmail.com", "-f " . "pushidrosal.mail@gmail.com");
                 }
+				$setum = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE satuan = 6 and tingkatan = 1")->result();
+				$stm_ = "";
+				foreach($setum as $stm){
+					$stm_ = "$stm->id,";
+				}
+				$this->pushFirebase($stm_);
             } else {
                 $this->db->query("UPDATE notadinas.surat_keluar SET status_surat_keluar = 8, opened = 88, updated_at = '$upd_date' WHERE id = $idu");
-                $this->db->query("UPDATE notadinas.tembusan_surat_keluar SET status = 0 WHERE id_surat_keluar = $idu");
-                $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','1','')");
+                $this->db->query("UPDATE notadinas.tembusan_surat_keluar SET status = 0, tanggal = NULL WHERE id_surat_keluar = $idu");
+                $this->db->query("INSERT INTO notadinas.log_proses_surat_keluar VALUES ('" . $lpskids . "','" . $idu . "','$upd_date','" . $this->session->userdata('admin_id') . "','" . $cc->kepada . "','" . $cc->keterangan . "','7','')");
+				$userZ = $this->db->query("SELECT * FROM notadinas.master_user WHERE id = $cc->create_by")->row();
+				$this->pushFirebase($userZ->jabatan);
+				// $this->dd($userZ->jabatan); // qaz
             }
 
             $cc = $this->db->query("SELECT * FROM notadinas.surat_keluar WHERE id = '" . $idu . "'")->row();
@@ -2481,8 +2525,13 @@ ORDER BY updated_at DESC")->result();
             $a['datpil'] = $this->db->query("SELECT notadinas.surat_keluar.*, notadinas.master_tujuan.nama FROM notadinas.surat_keluar JOIN notadinas.master_tujuan ON notadinas.surat_keluar.kepada = notadinas.master_tujuan.id WHERE notadinas.surat_keluar.id = '$idu'")->row();
 			$a['datpil100'] = $this->db->query("SELECT * FROM notadinas.log_proses_surat_keluar WHERE id_suratkeluar = '$idu' order by id desc")->row();
             $a['page'] = "f_surat_keluar";
+			$this->pushFirebase($this->session->userdata('admin_jabatan'));
         } else if ($mau_ke == "kirim_kelain") {
-            $data_tembusan = $this->db->query("SELECT id from notadinas.tembusan_surat_keluar WHERE id_surat_keluar = '" . $idu . "';")->result();
+            $data_tembusan = $this->db->query("SELECT id, id_jabatan from notadinas.tembusan_surat_keluar WHERE id_surat_keluar = '" . $idu . "';")->result();
+			$jabatan_push_notif = "";
+			foreach($data_tembusan as $d_t){
+				$jabatan_push_notif .= "$d_t->id_jabatan,";
+			}
             $create_by =  $this->db->query("SELECT * FROM notadinas.surat_keluar WHERE id = '" . $idu . "';")->result_array();
 
             if (!empty($data_tembusan)) {
@@ -2497,6 +2546,7 @@ ORDER BY updated_at DESC")->result();
                         $or = "";
                     }
                     $idJabatanForSocket[] = $a->id_jabatan;
+					$jabatan_push_notif .= "$a->id_jabatan,";
                     $mail_result .= "notadinas.master_user.jabatan = " . $a->id_jabatan . " " . $or;
                     $count = $count + 1;
                 }
@@ -2507,9 +2557,14 @@ ORDER BY updated_at DESC")->result();
             } else {
                 if($create_by[0]['create_by'] == 1){
                $this->db->query("UPDATE notadinas.surat_keluar SET status_surat_keluar = 2,opened = 2, updated_at = '$upd_date' WHERE id = $idu");
+					$jabatan_push_notif .= "1,";
                 } else {
 
                 $this->db->query("UPDATE notadinas.surat_keluar SET status_surat_keluar = 5,opened = 5, updated_at = '$upd_date' WHERE id = $idu");
+				$jabatan_setum = $this->db->query('SELECT id FROM notadinas.master_jabatan WHERE satuan = 6 AND tingkatan = 1')->result();
+				foreach($jabatan_setum as $jstm){					
+					$jabatan_push_notif .= "$jstm->id,";
+				}
                 }
 
             }
@@ -2542,6 +2597,9 @@ ORDER BY updated_at DESC")->result();
             }
 
             $_SESSION['socketAdded'] = $socketData;
+			$this->db->query("UPDATE notadinas.tembusan_surat_keluar SET tanggal = NULL WHERE id_surat_keluar = $idu");
+			$this->db->query("UPDATE notadinas.surat_keluar SET status_tujuan = 0 WHERE id = $idu");
+			$this->pushFirebase($jabatan_push_notif."1");
             redirect(base_url() . 'admin/surat_keluar');
         } else if ($mau_ke == "cetak_input_tembusan") {
             $data = addslashes($this->input->post('data'));
@@ -4510,7 +4568,7 @@ ORDER BY updated_at DESC")->result();
             );
             $this->session->set_userdata($data);
 			date_default_timezone_set('Asia/Jakarta');
-			$datetime = date("d-m-Y H:i:s");
+			$datetime = date("Y-m-d H:i:s");
 			$this->db->query("INSERT INTO notadinas.log_user VALUES(DEFAULT,".$this->session->userdata('admin_id').",'$datetime');");
             redirect('admin');
         } else {
@@ -5325,9 +5383,48 @@ ORDER BY updated_at DESC")->result();
        echo $valid;
     }
 	public function test(){
-		$TemBusanz = $this->db->query("SELECT * FROM notadinas.tembusan_nota_dinas WHERE id_notadinas = 2 AND id_jabatan = 6")->row();
-		echo $TemBusanz->id_jabatan;
-		$this->dd($TemBusanz);
+		
+	}
+	public function cetakCondition($satuan,$surat){
+		$kadis = $this->db->query("
+			SELECT u.*
+			FROM notadinas.master_jabatan as j
+			INNER JOIN notadinas.master_user as u
+				ON u.jabatan = j.id
+			WHERE
+				j.tingkatan = 1
+				AND j.satuan = $satuan
+		")->result();
+		$tembusan = [];
+		foreach($kadis as $k){
+			$subdis = $this->db->query("
+				SELECT 
+					a.id
+				FROM notadinas.master_jabatan as a
+				INNER JOIN notadinas.master_subjabatan as b
+					ON a.subdis = b.id_subjabatan
+				INNER JOIN notadinas.master_jabatan as c
+					ON b.id_jabatan = c.id
+				WHERE
+					b.id_jabatan = '$k->id'
+					AND
+					a.tingkatan = 2
+			")->result();
+			foreach($subdis as $s){
+				$query = $this->db->query("
+					SELECT *
+					FROM notadinas.log_proses_surat_masuk
+					WHERE
+						id_suratmasuk = $surat
+						AND pengirim = $k->id
+						AND penerima = $s->id
+				")->row();
+				if($query!=NULL){					
+					$tembusan[$s->id] = true;
+				}
+			}
+		}
+		return $tembusan;
 	}
 	
 	function getabx(){

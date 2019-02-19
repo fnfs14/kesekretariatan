@@ -454,7 +454,7 @@ if ($this->session->userdata('admin_jabatan') == 2) {
                     <tr>
                         <td style="vertical-align:top;">File Koreksi</td>
                         <td colspan="4"><a
-                                    href="<?php echo base_URL(); ?>upload/surat_keluar/<?php echo $file_attachment; ?>"
+                                    href="<?php echo base_URL(); ?>upload/surat_keluar/<?php echo $lognya->file_revisi; ?>"
                                     target='_blank'><?php echo $lognya->file_revisi; ?></a></td>
                     </tr>
                 <?php }
@@ -1104,3 +1104,93 @@ if ($this->session->userdata('admin_jabatan') == 2) {
             });
     }
 </script>
+
+<?php
+// if($status_surat==0 or $status_surat==3 or $status_surat==8){
+$log = $this->db->query("SELECT * FROM notadinas.log_proses_surat_keluar INNER JOIN notadinas.master_proses_surat_keluar ON notadinas.log_proses_surat_keluar.id_proses = notadinas.master_proses_surat_keluar.id INNER JOIN notadinas.master_user ON notadinas.master_user.id = notadinas.log_proses_surat_keluar.pengirim WHERE log_proses_surat_keluar.id_suratkeluar = $idp ORDER BY notadinas.log_proses_surat_keluar.id ASC")->result();
+$keteranganZ = "";
+?>
+	<div class="navbar navbar-inverse">
+		<div class="container z0">
+			<div class="navbar-header">
+				<span class="navbar-brand" href="#">Verifikasi Konsep</span>
+			</div>
+		</div><!-- /.container -->
+	</div>
+	<div class="row-fluid well" style="overflow: hidden">
+		<div class="col-lg-12">
+			<table width="100%" class="table-form">
+				<tr>
+					<td width="15%"></td>
+					<td width="30%"></td>
+					<td width="10%"></td>
+					<td width="15%"></td>
+					<td width="30%">
+						<button class='btn-default btn btn-sm' type='button' data-toggle="modal"
+								data-target="#myModalZ" style="float:right;">Log Surat
+						</button>
+					</td>
+				</tr>
+				<tr>
+					<td style="vertical-align:top;">Komentar</td>
+					<td colspan='4'><textarea id='komentar_kapushidrosalZ' class='form-control'></textarea></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+    <div class="modal fade" id="myModalZ" role="dialog">
+        <div class="modal-dialog" style="width:70% !important;">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="background:#194896;color:white;font-weight:bold;text-align:center;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Log Surat</h4>
+                </div>
+                <div class="modal-body">
+                    <table id="exampleZ" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Satker</th>
+                            <th>Tanggal Proses</th>
+                            <th>Keterangan</th>
+                            <th>Komentar</th>
+                            <th>Proses</th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        </tfoot>
+                        <tbody>
+                        <?php $azx = 1;
+                        foreach ($log as $m) {
+                            echo "<tr>
+						<td>$azx</td>
+						<td>$m->nama_lengkap</td>
+						<td>$m->tanggal_proses</td>
+						<td>$m->Keterangan</td>
+						<td>$m->komentar</td>
+						<td>$m->nama_proses</td>
+					</tr>";
+                            $azx += 1;
+							if($m->komentar!='' and $m->komentar!=null and $m->komentar!="''"){
+								 $keteranganZ .= $m->komentar;
+							}
+                        } ?>
+                        </tbody>
+                    </table>
+                    <script>
+                        $(document).ready(function () {
+                            $('#exampleZ').DataTable();
+                        });
+                    </script>
+                </div>
+            </div>
+
+        </div>
+    </div>
+	<script>
+	$("#komentar_kapushidrosalZ").html("<?= $keteranganZ; ?>");
+	</script>
+<?php 
+// } 
+?>

@@ -1,4 +1,6 @@
+<?php if($checkSubdis==""){ ?>
 <div class='page-break'></div>
+<?php } ?>
 <br/>
 <br/>
 <br/>
