@@ -2951,7 +2951,7 @@ ORDER BY updated_at DESC")->result();
             $idapd = $this->eoffice->query("SELECT MAX(id) AS qwi FROM fo_application_logs")->row();
                     $idapds = $idapd->qwi + 1;
             $date_wrk_d = date('Y-m-d h:i:s');
-            $this->eoffice->query("INSERT INTO fo_application_logs (id, taken_by_id, rel_object_id, object_name, created_on, created_by_id, action, is_private, is_silent, member_id, log_data) VALUES ('".$idapds."', '".$id_usefd."', '".$object_id_d."', '".$object->idobjd."', '".$date_wrk_d."', '".$id_usefd."', 'delete', '0', '0', '".$member_id_d."', 'member deleted')");
+            $this->eoffice->query("INSERT INTO fo_application_logs (id, taken_by_id, rel_object_id, object_name, created_on, created_by_id, action, is_private, is_silent, member_id, log_data) VALUES ('".$idapds."', '".$id_usefd."', '".$object_id_d."', '".$idobjd."', '".$date_wrk_d."', '".$id_usefd."', 'delete', '0', '0', '".$member_id_d."', 'member deleted')");
             $this->eoffice->query("DELETE FROM fo_searchable_objects WHERE rel_object_id = $object_id_d");
             $this->eoffice->query("DELETE FROM fo_sharing_table WHERE object_id = $object_id_d");
             $this->eoffice->query("DELETE FROM fo_workspaces WHERE object_id = $object_id_d");
