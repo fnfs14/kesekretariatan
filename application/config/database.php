@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-@@ -1,121 +0,0 @@
->>>>>>> 194e1ad53ce14a572b6c30b6af7b3dced7b91835
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -82,7 +78,7 @@ $db['default'] = array(
 	'hostname' => 'localhost',
 	'username' => 'postgres',
 	'password' => 'admin',
-	'database' => 'pushidrosal',
+	'database' => 'pushidrosal_v2',
 	'port' => 5432,
 	'dbdriver' => 'postgre',
 	'schema' => 'notadinas',
@@ -105,7 +101,7 @@ $db['eoffice'] = array(
 	'hostname' => '192.168.2.10',
 	'username' => 'root',
 	'password' => '',
-	'database' => 'eoffice',
+	'database' => 'eoffice_v2',
 	'port' => 3307,
 	'dbdriver' => 'mysqli',
 	'schema' => '',
