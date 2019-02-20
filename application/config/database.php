@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+@@ -1,121 +0,0 @@
+>>>>>>> 194e1ad53ce14a572b6c30b6af7b3dced7b91835
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 

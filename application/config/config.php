@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+@@ -1,529 +0,0 @@
+>>>>>>> 194e1ad53ce14a572b6c30b6af7b3dced7b91835
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -526,4 +530,8 @@ $config['rewrite_short_tags'] = FALSE;
 | Comma-separated:	'10.0.1.200,192.168.5.0/24'
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
+<<<<<<< HEAD
 $config['proxy_ips'] = '';
+=======
+$config['proxy_ips'] = '';
+>>>>>>> 194e1ad53ce14a572b6c30b6af7b3dced7b91835
