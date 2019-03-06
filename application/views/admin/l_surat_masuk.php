@@ -138,8 +138,58 @@ display: none;
 								$tmpStatus = $q->disposisi;
 							}
 							$jabatanQ = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE id = $tmpJabatan")->row();
-							echo $jabatanQ->nama_jabatan . ", ";
+							// echo $jabatanQ->nama_jabatan . ", ";
 						}
+						
+				$disposisiQz = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk INNER JOIN notadinas.master_jabatan ON notadinas.master_jabatan.id =  notadinas.disposisi_surat_masuk.penerima_disposisi WHERE id_surat_masuk = $b->id ORDER BY urut_jabatan ASC")->result();
+				$StatDispC = 0;
+				// while($StatDispC < 2){
+					foreach($disposisiQz as $q){
+						if($q->penerima_disposisi!=null){
+							$tmpJabatan = $q->penerima_disposisi;
+							$tmpStatus = $q->status;
+						}else{
+							$tmpJabatan = $q->penerima_disposisi_satuan;
+							$tmpStatus = $q->disposisi;
+						}
+						// echo $tmpJabatan."hhh";
+						$jabatanQ = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE id = $tmpJabatan")->row();
+						echo "<b>".$jabatanQ->nama_jabatan . "</b> : ";
+						$tmptingkatan = $jabatanQ->tingkatan;
+						// echo "<br>".$tmptingkatan."-".$tmpStatus."<br>";
+						if(($tmptingkatan==1 and $tmpStatus==1) or ($tmptingkatan==2 and $tmpStatus!="yes") or ($jabatanQ->tingkatan=="" and $tmpStatus==1)){
+							echo "<i class='fa fa-circle-o' aria-hidden='true' style='color: green !important;'></i> <i class='fa fa-circle' aria-hidden='true' style='color: red !important'></i><br>";
+						}else{
+							echo "<i class='fa fa-circle' aria-hidden='true' style='color: green !important;'></i> <i class='fa fa-circle-o' aria-hidden='true' style='color: red !important'></i><br>";
+						}
+					//n
+					$disposisio = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk INNER JOIN notadinas.master_jabatan ON notadinas.master_jabatan.id =  notadinas.disposisi_surat_masuk.penerima_disposisi_satuan WHERE id_surat_masuk = '".$b->id."' ORDER BY urut_jabatan ASC")->result();
+					foreach($disposisio as $u){
+						$a1 = $q->satuan;
+						$a2 = $q->tingkatan;
+						$b1 = $u->satuan;
+						$b2 = $u->tingkatan;
+						$tmpJabatanu = $u->penerima_disposisi_satuan;
+						$tmpStatusu = $u->disposisi;
+						// echo $a1."".$a2;
+						if($a1 == $b1 && $b2 == 2){
+							// echo "asasa";
+							$jabatanQu = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE id = $tmpJabatanu")->row();
+						echo "".$jabatanQu->nama_jabatan . " : ";
+						$tmptingkatanu = $jabatanQu->tingkatan;
+						// echo "<br>".$tmptingkatan."-".$tmpStatus."<br>";
+						if(($tmptingkatanu==1 and $tmpStatusu==1) or ($tmptingkatanu==2 and $tmpStatusu!="yes") or ($jabatanQu->tingkatan=="" and $tmpStatusu==1)){
+							echo "<i class='fa fa-circle-o' aria-hidden='true' style='color: green !important;'></i> <i class='fa fa-circle' aria-hidden='true' style='color: red !important'></i><br>";
+						}else{
+							echo "<i class='fa fa-circle' aria-hidden='true' style='color: green !important;'></i> <i class='fa fa-circle-o' aria-hidden='true' style='color: red !important'></i><br>";
+						}
+							
+						}
+					}
+					//n
+						
+					}
+				
 					}
 				} ?>
 				
@@ -171,9 +221,8 @@ display: none;
 						}else{
 							echo "<i class='fa fa-circle' aria-hidden='true' style='color: green !important;'></i> <i class='fa fa-circle-o' aria-hidden='true' style='color: red !important'></i><br>";
 						}
-						
-					//n
-					$disposisio = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk INNER JOIN notadinas.master_jabatan ON notadinas.master_jabatan.id =  notadinas.disposisi_surat_masuk.penerima_disposisi_satuan WHERE id_surat_masuk = $b->id ORDER BY urut_jabatan ASC")->result();
+						//n
+					$disposisio = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk INNER JOIN notadinas.master_jabatan ON notadinas.master_jabatan.id =  notadinas.disposisi_surat_masuk.penerima_disposisi_satuan WHERE id_surat_masuk = '".$b->id."' ORDER BY urut_jabatan ASC")->result();
 					foreach($disposisio as $u){
 						$a1 = $q->satuan;
 						$a2 = $q->tingkatan;
@@ -198,9 +247,9 @@ display: none;
 					}
 					//n
 					}
-				//	$disposisiQz = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk INNER JOIN notadinas.master_jabatan ON notadinas.master_jabatan.id =  notadinas.disposisi_surat_masuk.penerima_disposisi_satuan WHERE id_surat_masuk = $b->id ORDER BY urut_jabatan ASC")->result();
+					/* $disposisiQz = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk INNER JOIN notadinas.master_jabatan ON notadinas.master_jabatan.id =  notadinas.disposisi_surat_masuk.penerima_disposisi_satuan WHERE id_surat_masuk = $b->id ORDER BY urut_jabatan ASC")->result();
 					$StatDispC+=1;
-				// }
+				} */
 				echo "</td>";
 			} ?>
 			<td>
@@ -316,19 +365,4 @@ $(window).load(function(){
         dataTable.fnFilter(this.value);
     });
 });
-function baca(e,j) {	
-	$.get('<?= base_url()."administrator/baca_feedback" ?>',{id:e},function (data) {
-		window.location.assign("<?php echo base_url();?>admin/surat_masuk/"+j+"/"+e);
-	})
-}
-function bacasatuan(e,j) {
-	$.get('<?= base_url()."administrator/baca_feedback_satuan" ?>',{id:e},function (data) {
-		window.location.assign("<?php echo base_url();?>admin/surat_masuk/"+j+"/"+e);
-	})
-}
-function bacaKadis(e,j) {
-	$.get('<?= base_url()."administrator/baca_feedback_kadis" ?>',{id:e},function (data) {
-		window.location.assign("<?php echo base_url();?>admin/surat_masuk/"+j+"/"+e);
-	})
-}
 </script>
