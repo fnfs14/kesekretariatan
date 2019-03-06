@@ -710,7 +710,7 @@ ORDER BY updated_at DESC")->result();
         // }
     }
 
-    function cetak_surat_masuk($idu)//ubah mei surmas5
+   function cetak_surat_masuk($idu)//ubah mei surmas5
     {
         $dati = str_replace("_", "/", $idu);
         $dita = $this->db->query("SELECT * FROM notadinas.surat_masuk WHERE no_setum = '$dati'")->row();
@@ -737,6 +737,7 @@ ORDER BY updated_at DESC")->result();
         $this->load->view('admin/cetak/surat_masuk', $a);
 		
 		$checkSubdis = "";
+		$checkSubdis2 = "";
 		if($this->session->userdata('admin_tingkatan')==2){			
 			$checkSubdisQ = $this->cetakCondition($this->session->userdata('admin_satuan'),$idb);
 			if(
@@ -747,6 +748,7 @@ ORDER BY updated_at DESC")->result();
 			}
 		}
 		$disp['checkSubdis'] = $checkSubdis;
+		$disp['checkSubdis2'] = $checkSubdis2;
 		$disp['alamat_aksi'] = $this->getSelectedJabatan();	
 		$disp['aksi'] = $this->db->query('SELECT * FROM notadinas.master_aksi ORDER BY id ASC')->result();
 		$disp['idbut'] = $idb;
@@ -795,6 +797,9 @@ ORDER BY updated_at DESC")->result();
 					id_jab ASC,
 					urut_subjab ASC
 				")->result();
+			if($kadisp['alamat_aksi_sub'] == NULL){
+				$kadisp['checkSubdis2'] = "display: none;";
+			}
 			$this->load->view('admin/cetak/surat_masuk_kadisp', $kadisp);
 		}
 
@@ -1422,7 +1427,16 @@ ORDER BY updated_at DESC")->result();
             join notadinas.master_aksi e on b.aksi = e.id
             where b.status = 1 and a.id = '$idu'")->result();
             $a['dataksi'] = $this->db->query("SELECT * FROM notadinas.master_aksi ORDER BY urutan ASC")->result();
-            $a['datasatuan'] = $this->db->query("SELECT a.*, b.id_jabatan as id_jab, b.urut_subjabatan as urut_subjab, c.nama_jabatan as nam_jab FROM notadinas.master_jabatan as a INNER JOIN notadinas.master_subjabatan as b ON a.subdis = b.id_subjabatan INNER JOIN notadinas.master_jabatan as c ON b.id_jabatan = c.id WHERE b.id_jabatan = '". $this->session->userdata('admin_jabatan') ."' AND a.tingkatan = 2 ORDER BY c.urut_jabatan ASC,id_jab ASC ,urut_subjab ASC")->result();
+			if($this->session->userdata('admin_tingkatan')==2){
+				$sat = $this->session->userdata("admin_satuan");
+				$a['datasatuan'] = $this->db->query("
+					SELECT *
+					FROM notadinas.master_jabatan
+					WHERE satuan = $sat
+				")->result();
+			}else{				
+				$a['datasatuan'] = $this->db->query("SELECT a.*, b.id_jabatan as id_jab, b.urut_subjabatan as urut_subjab, c.nama_jabatan as nam_jab FROM notadinas.master_jabatan as a INNER JOIN notadinas.master_subjabatan as b ON a.subdis = b.id_subjabatan INNER JOIN notadinas.master_jabatan as c ON b.id_jabatan = c.id WHERE b.id_jabatan = '". $this->session->userdata('admin_jabatan') ."' AND a.tingkatan = 2 ORDER BY c.urut_jabatan ASC,id_jab ASC ,urut_subjab ASC")->result();
+			}
 			// $a['datajabat'] = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE urutan IS NOT NULL AND urutan != 0 ORDER BY urutan ASC")->result();//ubah baru lagi
 			$a['datajabat'] = $this->getSelectedJabatan();
             $a['query12'] = $this->db->query("SELECT * FROM notadinas.master_ruangkrj ORDER BY id_ruang_kerja ASC")->result();
@@ -2914,12 +2928,9 @@ ORDER BY updated_at DESC")->result();
         $this->load->view('admin/aaa', $a);
     }
 
-    public function manage_ruangkrj()//ubah master ruang kerja mei
+    public function manage_ruangkrj()
     {
-                    $this->eoffice = $this->load->database('eoffice', TRUE);
-                    // $query = $this->eoffice->query("SELECT * FROM test")->result();
-                    // var_dump($query);
-                    // die();
+        $this->eoffice = $this->load->database('eoffice', TRUE);
         date_default_timezone_set('Asia/Jakarta');
         $id_ruang_kerja = addslashes($this->input->post('id_ruang_kerja'));
         $nama_krj = addslashes($this->input->post('nama_krj'));
@@ -2933,25 +2944,27 @@ ORDER BY updated_at DESC")->result();
         $aksi = $this->uri->segment(3);
         $q = $this->uri->segment(4);
         if ($aksi == "add") {
-			$a['jenissurat'] = $this->db->query("SELECT * FROM notadinas.master_surat_masuk ORDER BY id_master_surat_masuk")->result();
-            // $a['query'] = $query = $this->eoffice->query("SELECT * FROM fo_objects WHERE object_type_id = 1 AND trashed_on = '0000-00-00 00:00:00' AND trashed_by_id = 0 ORDER BY id")->result();
-            // var_dump($query);
-            // die();
+            $a['jenissurat'] = $this->db->query("SELECT * FROM notadinas.master_surat_masuk ORDER BY id_master_surat_masuk")->result();
             $a['page'] = "f_master_ruangkrj";
         } else if ($aksi == "delete") {
-            $idlogind = $this->session->userdata('admin_user');
-            $usefficed = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = '$idlogind'")->row();
-            $id_usefd = $usefficed->object_id;
+            //User Login
+            $userLogin = $this->session->userdata('admin_user');
+            $user_object = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = '$userLogin'")->row();
+            $idobject = $user_object->object_id;
+
+
+            //Object Id Ruang Kerja
             $object = $this->db->query("SELECT * FROM notadinas.master_ruangkrj WHERE id_ruang_kerja = '$q'")->row();
             $object_id_d = $object->object_id;
-            $objectd = $this->eoffice->query("SELECT * FROM fo_objects WHERE id = '$object_id_d'")->row();
-                $idobjd = $objectd->name;
             $member = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '$object_id_d'")->row();
             $member_id_d = $member->id;
+            $objectd = $this->eoffice->query("SELECT * FROM fo_objects WHERE id = '$object_id_d'")->row();
+            $idobjd = $objectd->name;
+
             $idapd = $this->eoffice->query("SELECT MAX(id) AS qwi FROM fo_application_logs")->row();
-                    $idapds = $idapd->qwi + 1;
-            $date_wrk_d = date('Y-m-d h:i:s');
-            $this->eoffice->query("INSERT INTO fo_application_logs (id, taken_by_id, rel_object_id, object_name, created_on, created_by_id, action, is_private, is_silent, member_id, log_data) VALUES ('".$idapds."', '".$id_usefd."', '".$object_id_d."', '".$idobjd."', '".$date_wrk_d."', '".$id_usefd."', 'delete', '0', '0', '".$member_id_d."', 'member deleted')");
+                        $idapds = $idapd->qwi + 1;
+
+            $this->eoffice->query("INSERT INTO fo_application_logs (id, taken_by_id, rel_object_id, object_name, created_on, created_by_id, action, is_private, is_silent, member_id, log_data) VALUES ('".$idapds."', '".$idobject."', '".$object_id_d."', '".$idobjd."', '".$date_wrk_d."', '".$idobject."', 'delete', '0', '0', '".$member_id_d."', 'member deleted')");
             $this->eoffice->query("DELETE FROM fo_searchable_objects WHERE rel_object_id = $object_id_d");
             $this->eoffice->query("DELETE FROM fo_sharing_table WHERE object_id = $object_id_d");
             $this->eoffice->query("DELETE FROM fo_workspaces WHERE object_id = $object_id_d");
@@ -2966,13 +2979,13 @@ ORDER BY updated_at DESC")->result();
             $a['data'] = $this->db->query("SELECT notadinas.master_ruangkrj.*,notadinas.master_surat_masuk.* FROM notadinas.master_ruangkrj LEFT JOIN notadinas.master_surat_masuk ON notadinas.master_ruangkrj.id_jenissurat = notadinas.master_surat_masuk.id_master_surat_masuk ORDER BY notadinas.master_ruangkrj.id_ruang_kerja")->result();
             $a['page'] = "l_master_ruangkrj";
         } else if ($aksi == "edt") {
-			$a['jenissurat'] = $this->db->query("SELECT * FROM notadinas.master_surat_masuk ORDER BY id_master_surat_masuk")->result();
+            $a['jenissurat'] = $this->db->query("SELECT * FROM notadinas.master_surat_masuk ORDER BY id_master_surat_masuk")->result();
             
             $a['query'] = $query = $this->eoffice->query("SELECT * FROM fo_objects WHERE object_type_id = 1 AND trashed_on = '0000-00-00 00:00:00' AND trashed_by_id = 0 ORDER BY id")->result();
             $a['datas'] = $this->db->query("SELECT * FROM notadinas.master_ruangkrj WHERE id_ruang_kerja = '$q'")->row();
             $a['page'] = "f_master_ruangkrj";
         } else if ($aksi == "act_edt") {
-			$ijs = $this->input->post('id_jenissurat');
+            $ijs = $this->input->post('id_jenissurat');
             $cek_user_exist = $this->db->query("SELECT nama_krj FROM notadinas.master_ruangkrj WHERE nama_krj = '$nama_krj' and id_jenissurat='$ijs'")->num_rows();
             /* if ($cek_user_exist > 0) {
             $this->session->set_flashdata("k", "<div class=\"alert alert-danger\" id=\"alert\">Ruang Kerja Sudah Ada. Silahkan Buat Dengan Nama Yang Lain.</div>");
@@ -2985,36 +2998,35 @@ ORDER BY updated_at DESC")->result();
             // $rk = addslashes($this->input->post('rknya'));
 
             $date_wrk_u = date('Y-m-d h:i:s');
-            $userLoginu = $this->session->userdata('admin_user');
-                    // var_dump($jids);
-            $usefficeu = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = '$userLoginu'")->row();
-            $id_usefu = $usefficeu->object_id;
+            //User Login
+            $userLogin = $this->session->userdata('admin_user');
+            $user_object = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = '$userLogin'")->row();
+            $idobject = $user_object->object_id;
+            $user_permission = $this->eoffice->query("SELECT * FROM fo_permission_groups WHERE contact_id = '$idobject'")->row();
+            $idpermission = $user_permission->id;
+
+            //Object Id Ruang Kerja
             $object = $this->db->query("SELECT * FROM notadinas.master_ruangkrj WHERE id_ruang_kerja = '$idp'")->row();
             $object_id_u = $object->object_id;
-            // $parent = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '$rk'")->row();
-            // $depth_up = $parent->depth + 1;
             $member = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '$object_id_u'")->row();
             $member_id_u = $member->id;
-            $idap = $this->eoffice->query("SELECT MAX(id) AS qwi FROM fo_application_logs")->row();
-                    $idaps = $idap->qwi + 1;
-            $this->eoffice->query("UPDATE fo_objects SET updated_on = '".$date_wrk_u."', updated_by_id = '".$id_usefu."', name = '".$nama_krj."' WHERE id = '".$object_id_u."'");
-            // if($parent->depth=='1'){
-                $this->eoffice->query("UPDATE fo_members SET parent_member_id = '".$parent->id."', depth = '".$depth_up."', name = '".$nama_krj."', color = '12' WHERE id = '".$member_id_u."'");
-            // }else if($parent->depth=='2'){
-            //     $this->eoffice->query("UPDATE fo_members SET parent_member_id = '".$parent->id."', depth = '".$depth_up."', name = '".$nama_krj."', color = '23' WHERE id = '".$member_id_u."'");
-            // }
-            $this->eoffice->query("INSERT INTO fo_application_logs (id, taken_by_id, rel_object_id, object_name, created_on, created_by_id, action, is_private, is_silent, member_id, log_data) VALUES ('".$idaps."', '".$id_usefu."', '".$object_id_u."', '".$nama_krj."', '".$date_wrk_u."', '".$id_usefu."', 'edit', '0', '0', '".$member_id_u."', '')");
+
+           $idap = $this->eoffice->query("SELECT MAX(id) AS qwi FROM fo_application_logs")->row();
+                        $idaps = $idap->qwi + 1;
+
+            $this->eoffice->query("UPDATE fo_objects SET updated_on = '".$date_wrk."', updated_by_id = '".$idobject."', name = '".$nama_krj."' WHERE id = '".$object_id_u."'");
+            
+            $this->eoffice->query("UPDATE fo_members SET name = '".$nama_krj."', description = 'Deskirpsi dari Ruang Kerja ".$nama_krj."' WHERE id = '".$member_id_u."'");
+            
+            $this->eoffice->query("INSERT INTO fo_application_logs (id, taken_by_id, rel_object_id, object_name, created_on, created_by_id, action, is_private, is_silent, member_id, log_data) VALUES ('".$idaps."', '".$idobject."', '".$object_id_u."', '".$nama_krj."', '".$date_wrk."', '".$idobject."', 'edit', '0', '0', '".$member_id_u."', '')");
             $this->eoffice->query("UPDATE fo_searchable_objects SET content = '".$nama_krj."' WHERE rel_object_id = '".$object_id_u."' AND column_name = 'name'");
 
-            // $quer = $this->eoffice->query("SELECT name as namanya FROM fo_objects WHERE object_type_id = 1 AND trashed_on = '0000-00-00 00:00:00' AND trashed_by_id = 0 AND id = '$rk'")->row();
-            // $namanya = $quer->namanya;
-			$id_jenissurat = $_POST['id_jenissurat'];
-            $this->db->query("UPDATE notadinas.master_ruangkrj SET nama_krj = '$nama_krj', id_jenissurat = '$id_jenissurat' WHERE id_ruang_kerja = '$idp'");
+            $this->db->query("UPDATE notadinas.master_ruangkrj SET nama_krj = '$nama_krj', id_jenissurat = '$ijs' WHERE id_ruang_kerja = '$idp'");
             $this->session->set_flashdata("k", "<div class=\"alert alert-success\" id=\"alert\">Data telah di update </div>");
            /* } */
             redirect('admin/manage_ruangkrj/m_ruangkrj');
         } else if ($aksi == "save") {
-			$ijs = $this->input->post('id_jenissurat');
+            $ijs = $this->input->post('id_jenissurat');
             $cek_user_exist = $this->db->query("SELECT nama_krj FROM notadinas.master_ruangkrj WHERE nama_krj = '$nama_krj' and id_jenissurat='$ijs'")->num_rows();
             if ($cek_user_exist > 0) {
             $this->session->set_flashdata("k", "<div class=\"alert alert-danger\" id=\"alert\">Ruang Kerja Sudah Ada. Silahkan Buat Dengan Nama Yang Lain.</div>");
@@ -3029,39 +3041,34 @@ ORDER BY updated_at DESC")->result();
                         $idals = $idal->qwi + 1;
                 $idmem = $this->eoffice->query("SELECT MAX(id) AS qwo FROM fo_members")->row();
                         $idmems = $idmem->qwo + 1;
+                //User Login
                 $userLogin = $this->session->userdata('admin_user');
-                        // var_dump($jids);
-                $useffice = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = '$userLogin'")->row();
-                // $parent_member = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '$rk'")->row();
-                $id_usef = $useffice->object_id;
-                // $id_parent = $parent_member->id;
-                // $name_perent = $parent_member->name;
-                $kpwk = $this->eoffice->query("SELECT * FROM fo_permission_groups WHERE contact_id = '$id_usef'")->row();//ubah disposisi mei
-                    $idkpwk = $kpwk->id;
-                $setum = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = 'setum'")->row();//ubah disposisi mei
-                    $idsetum = $setum->object_id;
-                $stm = $this->eoffice->query("SELECT * FROM fo_permission_groups WHERE contact_id = '$idsetum'")->row();//ubah disposisi mei
-                    $idstm = $stm->id;
+                $user_object = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = '$userLogin'")->row();
+                $idobject = $user_object->object_id;
+                $user_permission = $this->eoffice->query("SELECT * FROM fo_permission_groups WHERE contact_id = '$idobject'")->row();
+                $idpermission = $user_permission->id;
+                
+                //Tanggal Saat ini
                 $date_wrk = date('Y-m-d h:i:s');
                 $property_member_id = $this->eoffice->query("SELECT * FROM fo_members WHERE dimension_id = '1' ORDER BY id ASC")->result();
                 $object_member = $this->eoffice->query("SELECT * FROM fo_contacts WHERE is_company = '0' ORDER BY object_id ASC")->result();
                 $this->eoffice->query("DELETE FROM fo_contact_member_cache WHERE member_id = $idmems");
 
-                // var_dump($object_member);
-                // die();
-                $this->eoffice->query("INSERT INTO fo_objects (id, object_type_id, name, created_on, created_by_id, updated_on, updated_by_id, trashed_on, trashed_by_id, archived_on, archived_by_id, timezone_id, timezone_value) VALUES ('".$jids."', '1', '".$nama_krj."', '".$date_wrk."', '".$id_usef."', '".$date_wrk."', '".$id_usef."', '', '0', '', '0', '357', '25200')");
+                $this->eoffice->query("INSERT INTO fo_objects (id, object_type_id, name, created_on, created_by_id, updated_on, updated_by_id, trashed_on, trashed_by_id, archived_on, archived_by_id, timezone_id, timezone_value) VALUES ('".$jids."', '1', '".$nama_krj."', '".$date_wrk."', '".$idobject."', '".$date_wrk."', '".$idobject."', '', '0', '', '0', '357', '25200')");
 
                 $this->eoffice->query("INSERT INTO fo_members (id, dimension_id, object_type_id, parent_member_id, depth, name, description, object_id) VALUES ('".$idmems."', '2', '1', '0', '1', '".$nama_krj."', 'Deskripsi dari Ruang Kerja ".$nama_krj."', '".$jids."')");
+
                 $this->eoffice->query("UPDATE fo_members SET color = '12', archived_by_id = '0' WHERE id = '".$idmems."'");
 
-                $this->eoffice->query("INSERT INTO fo_application_logs (id, taken_by_id, rel_object_id, object_name, created_on, created_by_id, action, is_private, is_silent, member_id, log_data) VALUES ('".$idals."', '".$id_usef."', '".$jids."', '".$nama_krj."', '".$date_wrk."', '".$id_usef."', 'add', '0', '0', '".$idmems."', '')");
+                $this->eoffice->query("INSERT INTO fo_application_logs (id, taken_by_id, rel_object_id, object_name, created_on, created_by_id, action, is_private, is_silent, member_id, log_data) VALUES ('".$idals."', '".$idobject."', '".$jids."', '".$nama_krj."', '".$date_wrk."', '".$idobject."', 'add', '0', '0', '".$idmems."', '')");
                 $this->eoffice->query("INSERT INTO fo_searchable_objects (rel_object_id, column_name, content, contact_id) VALUES ('".$jids."', 'name', '".$nama_krj."', 0), ('".$jids."', 'object_id', '".$jids."', 0)");
-                $this->eoffice->query("INSERT INTO fo_sharing_table (group_id, object_id) VALUES ('0', '".$jids."'), ('".$idkpwk."', '".$jids."')");//ubah disposisi mei
                 $this->eoffice->query("INSERT INTO fo_workspaces (object_id, description, show_description_in_overview, color) VALUES ('".$jids."', '', '0', '0')");
+
+                $this->eoffice->query("INSERT INTO fo_sharing_table (group_id, object_id) VALUES ('0', '".$jids."'), ('".$idpermission."', '".$jids."')");
                 foreach ($property_member_id as $key) {
-                    $idmpm = $this->eoffice->query("SELECT MAX(id) AS wer FROM fo_member_property_members")->row();
-                        $idmpms = $idmpm->wer + 1;
-                    $this->eoffice->query("INSERT INTO fo_member_property_members (id, association_id, member_id, property_member_id, is_active, created_on, created_by_id) VALUES ('".$idmpms."', '1', '".$idmems."', '".$key->id."', '1', '".$date_wrk."', '".$id_usef."')");
+                    $idmpm = $this->eoffice->query("SELECT MAX(id) AS qwo FROM fo_member_property_members")->row();
+                    $idmpms = $idmpm->qwo + 1;
+                    $this->eoffice->query("INSERT INTO fo_member_property_members (id, association_id, member_id, property_member_id, is_active, created_on, created_by_id) VALUES ('".$idmpms."', '1', '".$idmems."', '".$key->id."', '1', '".$date_wrk."', '".$idobject."')");
                 }
                 foreach ($object_member as $key2) {
                     $this->eoffice->query("INSERT INTO fo_object_members (object_id, member_id, is_optimization) VALUES ('".$key2->object_id."', '".$idmems."', '0')");
@@ -3069,12 +3076,7 @@ ORDER BY updated_at DESC")->result();
                     $permission_group = $this->eoffice->query("SELECT * FROM fo_permission_groups WHERE contact_id = '".$key2->object_id."' ORDER BY contact_id ASC")->row();
                     $this->eoffice->query("INSERT INTO fo_contact_member_permissions (permission_group_id, member_id, object_type_id, can_write, can_delete) VALUES ('".$permission_group->id."', '".$idmems."', '1', '1', '1'), ('".$permission_group->id."', '".$idmems."', '3', '1', '1'),('".$permission_group->id."', '".$idmems."', '5', '1', '1'),('".$permission_group->id."', '".$idmems."', '6', '1', '1'),('".$permission_group->id."', '".$idmems."', '9', '1', '1'),('".$permission_group->id."', '".$idmems."', '10', '1', '1'),('".$permission_group->id."', '".$idmems."', '11', '1', '1'),('".$permission_group->id."', '".$idmems."', '15', '1', '1'),('".$permission_group->id."', '".$idmems."', '17', '1', '1'),('".$permission_group->id."', '".$idmems."', '22', '1', '1')");
                 }
-                // die();
-                // var_dump($parent_member);
-                // die();
-                // $quer = $this->eoffice->query("SELECT name as namanya FROM fo_objects WHERE object_type_id = 1 AND trashed_on = '0000-00-00 00:00:00' AND trashed_by_id = 0 AND id = '$rk'")->row();
-                // $namanya = $quer->namanya;
-                $this->db->query("INSERT INTO notadinas.master_ruangkrj VALUES ('".$jidz."','0','" . $nama_krj . "', '', '".$jids."', '".$_POST['id_jenissurat']."')");
+                $this->db->query("INSERT INTO notadinas.master_ruangkrj VALUES ('".$jidz."','0','" . $nama_krj . "', '', '".$jids."', '".$ijs."')");
                 $a['data'] = $this->db->query("SELECT * FROM notadinas.master_ruangkrj")->result();
             }
                 redirect('admin/manage_ruangkrj/m_ruangkrj');
@@ -3107,10 +3109,7 @@ ORDER BY updated_at DESC")->result();
 	
 	public function manage_task()
     {
-                    $this->eoffice = $this->load->database('eoffice', TRUE);
-                    // $query = $this->eoffice->query("SELECT * FROM test")->result();
-                    // var_dump($query);
-                    // die();
+        $this->eoffice = $this->load->database('eoffice', TRUE);
         date_default_timezone_set('Asia/Jakarta');
         $id_task = addslashes($this->input->post('id_task'));
         $nama_task = addslashes($this->input->post('nama_task'));
@@ -3156,36 +3155,40 @@ ORDER BY updated_at DESC")->result();
             $rk = addslashes($this->input->post('rknya'));
             $idal = $this->eoffice->query("SELECT MAX(id) AS qwi FROM fo_application_logs")->row();
                     $idals = $idal->qwi + 1;
-            $userLoginu = $this->session->userdata('admin_user');
-                    // var_dump($jids);
-            $usefficeu = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = '$userLoginu'")->row();
-                $id_usefu = $usefficeu->object_id;
-            $works_obj = $this->db->query("SELECT * FROM notadinas.master_ruangkrj WHERE id_ruang_kerja = '$rk'")->row();
-                $idobjworks = $works_obj->object_id;
-            $object = $this->db->query("SELECT * FROM notadinas.master_task WHERE id_task = '$idp'")->row();
-                $object_id_u = $object->object_id;
-            $setum = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = 'setum'")->row();
-                $idsetum = $setum->object_id;
-            $setum_member = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '$idsetum'")->row();
-                $id_memsetum = $setum_member->id;
-            $log_member = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '$id_usefu'")->row();
-                $id_memlog = $log_member->id;
-            $member_works = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '".$idobjworks."'")->row();
-                $id_memworks = $member_works->id;
-            $logdat = $idsetum.",".$id_usefu;
-            $date_wrk_e = date('Y-m-d h:i:s');
-            $this->eoffice->query("UPDATE fo_objects SET updated_on = '".$date_wrk_e."', updated_by_id = '".$id_usefu."', name = '".$nama_task."' WHERE id = '".$object_id_u."'");
-            $this->eoffice->query("INSERT INTO fo_application_logs (id, taken_by_id, rel_object_id, object_name, created_on, created_by_id, action, is_private, is_silent, member_id, log_data) VALUES ('".$idals."', '".$id_usefu."', '".$object_id_u."', '".$nama_task."', '".$date_wrk_e."', '".$id_usefu."', 'edit', '0', '0', '0', '".$logdat."')");
-            $this->eoffice->query("UPDATE fo_project_tasks SET text = 'Deskripsi dari Tugas ".$nama_task."' WHERE object_id = '".$object_id_u."'");
-            $this->eoffice->query("UPDATE fo_searchable_objects SET content = '".$nama_task."' WHERE rel_object_id = '".$object_id_u."' AND column_name = 'name'");
-            $this->eoffice->query("UPDATE fo_searchable_objects SET content = 'Deskripsi dari Tugas ".$nama_task."' WHERE rel_object_id = '".$object_id_u."' AND column_name = 'text'");
-            $this->eoffice->query("DELETE FROM fo_object_members WHERE object_id = $object_id_u");
-            $this->eoffice->query("INSERT INTO fo_object_members (object_id, member_id, is_optimization) VALUES ('".$object_id_u."', '".$id_memsetum."', '0'), ('".$object_id_u."', '".$id_memlog."', '0'), ('".$object_id_u."', '".$id_memworks."', '0')");
+            //User Login
+	        $userLoginu = $this->session->userdata('admin_user');
+	        $usefficeu = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = '$userLoginu'")->row();
+	        $id_usefu = $usefficeu->object_id;
+	        $log_member = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '$id_usefu'")->row();
+	        $id_memlog = $log_member->id;
+
+	        //Ruang Kerja
+	        $works_obj = $this->db->query("SELECT * FROM notadinas.master_ruangkrj WHERE id_ruang_kerja = '$rk'")->row();
+	        $idobjworks = $works_obj->object_id;
+	        $member_works = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '".$idobjworks."'")->row();
+	        $id_memworks = $member_works->id;
+
+	        //Object Task
+	        $object = $this->db->query("SELECT * FROM notadinas.master_task WHERE id_task = '$idp'")->row();
+	        $object_id_u = $object->object_id;
+
+	        //Assign To (sementara)
+	        $kapush = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = 'kapushidrosal'")->row();
+	        $idkapush = $kapush->object_id;
+	        $kapush_member = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '$idkapush'")->row();
+	        $id_memkapush = $kapush_member->id;
 
 
-            // $quer = $this->eoffice->query("SELECT name as namanya FROM fo_objects WHERE object_type_id = 5 AND trashed_on = '0000-00-00 00:00:00' AND trashed_by_id = 0 AND id = '$rk'")->row();
-            // $namanya = $quer->namanya;
-            $this->db->query("UPDATE notadinas.master_task SET id_etask = '$rk', nama_task = '$nama_task' WHERE id_task = '$idp'");
+	        $logdat = $idkapush.",".$id_usefu;
+	        $date_wrk_e = date('Y-m-d h:i:s');
+	        $this->eoffice->query("UPDATE fo_objects SET updated_on = '".$date_wrk_e."', updated_by_id = '".$id_usefu."', name = '".$nama_task."' WHERE id = '".$object_id_u."'");
+	        $this->eoffice->query("INSERT INTO fo_application_logs (id, taken_by_id, rel_object_id, object_name, created_on, created_by_id, action, is_private, is_silent, member_id, log_data) VALUES ('".$idals."', '".$id_usefu."', '".$object_id_u."', '".$nama_task."', '".$date_wrk_e."', '".$id_usefu."', 'edit', '0', '0', '0', '".$logdat."')");
+	        $this->eoffice->query("UPDATE fo_project_tasks SET text = 'Deskripsi dari Tugas ".$nama_task."' WHERE object_id = '".$object_id_u."'");
+	        $this->eoffice->query("UPDATE fo_searchable_objects SET content = '".$nama_task."' WHERE rel_object_id = '".$object_id_u."' AND column_name = 'name'");
+	        $this->eoffice->query("UPDATE fo_searchable_objects SET content = 'Deskripsi dari Tugas ".$nama_task."' WHERE rel_object_id = '".$object_id_u."' AND column_name = 'text'");
+	        $this->eoffice->query("DELETE FROM fo_object_members WHERE object_id = $object_id_u");
+	        $this->eoffice->query("INSERT INTO fo_object_members (object_id, member_id, is_optimization) VALUES ('".$object_id_u."', '".$id_memkapush."', '0'), ('".$object_id_u."', '".$id_memlog."', '0'), ('".$object_id_u."', '".$id_memworks."', '0')");
+	        $this->db->query("UPDATE notadinas.master_task SET id_etask = '$rk', nama_task = '$nama_task' WHERE id_task = '$idp'");
             $this->session->set_flashdata("k", "<div class=\"alert alert-success\" id=\"alert\">Data telah di update </div>");
             redirect('admin/manage_task/m_task');
         } else if ($aksi == "save") {
@@ -3200,48 +3203,46 @@ ORDER BY updated_at DESC")->result();
                     $idals2 = $idals + 1;
             $idmem = $this->eoffice->query("SELECT MAX(id) AS qwa FROM fo_members")->row();
                     $idmems = $idmem->qwa + 1;
-            $userLogin = $this->session->userdata('admin_user');
-            $useffice = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = '$userLogin'")->row();
-            $id_usef = $useffice->object_id;
-            $setum = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = 'setum'")->row();
-                $idsetum = $setum->object_id;
-            $setum_member = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '$idsetum'")->row();
-                $id_memsetum = $setum_member->id;
-            $log_member = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '$id_usef'")->row();
-                $id_memlog = $log_member->id;
-            $member_workspace = $this->db->query("SELECT * FROM notadinas.master_ruangkrj WHERE id_ruang_kerja = '$rk'")->row();
-            $member_works = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '".$member_workspace->object_id."'")->row();
-                $id_memworks = $member_works->id;
-            $date_wrk = date('Y-m-d h:i:s');
-            $date_ts = date('Y-m-d');
-            $idsub = $idsetum.', '.$id_usef;
-            $this->eoffice->query("DELETE FROM fo_object_members WHERE object_id = $jids");//ubah mei surmas
-            $this->eoffice->query("INSERT INTO fo_objects (id, object_type_id, name, created_on, created_by_id, updated_on, updated_by_id, trashed_on, trashed_by_id, archived_on, archived_by_id, timezone_id, timezone_value) VALUES ('".$jids."', '5', '".$nama_task."', '".$date_wrk."', '".$id_usef."', '".$date_wrk."', '".$id_usef."', '', '0', '', '0', '357', '25200')");
-            $this->eoffice->query("INSERT INTO fo_application_logs (id, taken_by_id, rel_object_id, object_name, created_on, created_by_id, action, is_private, is_silent, member_id, log_data) VALUES ('".$idals."', '".$id_usef."', '".$jids."', '".$nama_task."', '".$date_wrk."', '".$id_usef."', 'subscribe', '0', '1', '0', '".$idsub."')");
-            $this->eoffice->query("INSERT INTO fo_application_logs (id, taken_by_id, rel_object_id, object_name, created_on, created_by_id, action, is_private, is_silent, member_id, log_data) VALUES ('".$idals2."', '".$id_usef."', '".$jids."', '".$nama_task."', '".$date_wrk."', '".$id_usef."', 'add', '0', '0', '0', '')");
-            $this->eoffice->query("INSERT INTO fo_object_members (object_id, member_id, is_optimization) VALUES ('".$jids."', '".$id_memsetum."', '0'), ('".$jids."', '".$id_memlog."', '0'), ('".$jids."', '".$id_memworks."', '0')");
-             $this->eoffice->query("INSERT INTO fo_object_reminders (id, object_id, contact_id, type, context, minutes_before, date) VALUES ('".$idor."', '".$jids."', '0', 'reminder_email', 'due_date', 1440, '".$date_ts."')");
-            $this->eoffice->query("INSERT INTO fo_object_subscriptions (object_id, contact_id) VALUES ('".$jids."', '".$id_usef."'), ('".$jids."', '".$idsetum."')");
-            $this->eoffice->query("INSERT INTO fo_project_tasks (object_id, parent_id, parents_path, depth, text, due_date, start_date, assigned_to_contact_id, assigned_on, assigned_by_id, time_estimate, completed_on, completed_by_id, started_on, started_by_id, priority, state, milestone_id, is_template, from_template_id, from_template_object_id, repeat_end, repeat_forever, repeat_num, repeat_d, repeat_m, repeat_y, repeat_by, object_subtype, percent_completed, use_due_time, use_start_time, original_task_id, instantiation_id, type_content, total_worked_time) VALUES ('".$jids."', '0', '', '0', 'Deskripsi dari Tugas ".$nama_task."', '".$date_ts."', '".$date_ts."', '".$idsetum."', '".$date_wrk."', '".$id_usef."', '0', '', '0', '', '0', '200', '0', '0', '0', '0', '0', '', '0', '0', '0', '0', '0', '', '0', '0', '0', '0', '0', '0', 'html', '0')");
-            // $this->eoffice->query("UPDATE fo_project_tasks SET order = '6' WHERE object_id = '".$jids."'");
-            $this->eoffice->query("INSERT INTO fo_searchable_objects (rel_object_id, column_name, content, contact_id) VALUES ('".$jids."', 'text', 'Deskripsi dari Tugas ".$nama_task."', 0), ('".$jids."', 'name', '".$nama_task."', 0), ('".$jids."', 'object_id', '".$jids."', 0)");
-            $object_member = $this->eoffice->query("SELECT * FROM fo_contacts WHERE is_company = '0' ORDER BY object_id ASC")->result();
-            foreach ($object_member as $key2) {
-                $permission_group = $this->eoffice->query("SELECT * FROM fo_permission_groups WHERE contact_id = '".$key2->object_id."' ORDER BY contact_id ASC")->row();
-                $this->eoffice->query("INSERT INTO fo_sharing_table (group_id, object_id) VALUES ('".$permission_group->id."', '".$jids."')");
-            }
-            // $this->eoffice->query("INSERT INTO fo_sharing_table (group_id, object_id) VALUES ('17', '".$jids."')");
-            // $this->eoffice->query("INSERT INTO fo_sharing_table (group_id, object_id) VALUES ('18', '".$jids."')");
-            // $this->eoffice->query("INSERT INTO fo_sharing_table (group_id, object_id) VALUES ('27', '".$jids."')");
-            // for($u = 43; $u<=77; $u++){
-            //     if ($u!=44 AND $u!=53 AND $u!=68) {
-            //         $this->eoffice->query("INSERT INTO fo_sharing_table (group_id, object_id) VALUES ('".$u."', '".$jids."')");
-            //         // echo $u;
-            //     }
-            // }
-            // $quer = $this->eoffice->query("SELECT name as namanya FROM fo_objects WHERE object_type_id = 5 AND trashed_on = '0000-00-00 00:00:00' AND trashed_by_id = 0 AND id = '$rk'")->row();
-            // $namanya = $quer->namanya;
-            $this->db->query("INSERT INTO notadinas.master_task VALUES ('".$jidz."','".$rk."','" . $nama_task . "', '', '".$jids."')");
+            //User Login
+	        $userLogin = $this->session->userdata('admin_user');
+	        $useffice = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = '$userLogin'")->row();
+	        $id_usef = $useffice->object_id;
+	        $log_member = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '$id_usef'")->row();
+	        $id_memlog = $log_member->id;
+
+	        //Assign To (sementara)
+	        $kapush = $this->eoffice->query("SELECT * FROM fo_contacts WHERE username = 'kapushidrosal'")->row();
+	        $idkapush = $kapush->object_id;
+	        $kapush_member = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '$idkapush'")->row();
+	        $id_memkapush = $kapush_member->id;
+
+	        //Ruang kerja
+	        $member_workspace = $this->db->query("SELECT * FROM notadinas.master_ruangkrj WHERE id_ruang_kerja = '$rk'")->row();
+	        $member_works = $this->eoffice->query("SELECT * FROM fo_members WHERE object_id = '".$member_workspace->object_id."'")->row();
+	        $id_memworks = $member_works->id;
+
+	        //Date Now
+	        $date_wrk = date('Y-m-d h:i:s');
+	        $date_ts = date('Y-m-d');
+
+	        $idsub = $idkapush.', '.$id_usef;
+	        $this->eoffice->query("DELETE FROM fo_object_members WHERE object_id = $jids");
+	        $this->eoffice->query("INSERT INTO fo_objects (id, object_type_id, name, created_on, created_by_id, updated_on, updated_by_id, trashed_on, trashed_by_id, archived_on, archived_by_id, timezone_id, timezone_value) VALUES ('".$jids."', '5', '".$nama_task."', '".$date_wrk."', '".$id_usef."', '".$date_wrk."', '".$id_usef."', '', '0', '', '0', '357', '25200')");
+	        $this->eoffice->query("INSERT INTO fo_application_logs (id, taken_by_id, rel_object_id, object_name, created_on, created_by_id, action, is_private, is_silent, member_id, log_data) VALUES ('".$idals."', '".$id_usef."', '".$jids."', '".$nama_task."', '".$date_wrk."', '".$id_usef."', 'subscribe', '0', '1', '0', '".$idsub."')");
+	        $this->eoffice->query("INSERT INTO fo_application_logs (id, taken_by_id, rel_object_id, object_name, created_on, created_by_id, action, is_private, is_silent, member_id, log_data) VALUES ('".$idals2."', '".$id_usef."', '".$jids."', '".$nama_task."', '".$date_wrk."', '".$id_usef."', 'add', '0', '0', '0', '')");
+	        $this->eoffice->query("INSERT INTO fo_object_members (object_id, member_id, is_optimization) VALUES ('".$jids."', '".$id_memkapush."', '0'), ('".$jids."', '".$id_memlog."', '0'), ('".$jids."', '".$id_memworks."', '0')");
+	         $this->eoffice->query("INSERT INTO fo_object_reminders (id, object_id, contact_id, type, context, minutes_before, date) VALUES ('".$idor."', '".$jids."', '0', 'reminder_email', 'due_date', 1440, '".$date_ts."')");
+	        $this->eoffice->query("INSERT INTO fo_object_subscriptions (object_id, contact_id) VALUES ('".$jids."', '".$id_usef."'), ('".$jids."', '".$idkapush."')");
+	        $this->eoffice->query("INSERT INTO fo_project_tasks (object_id, parent_id, parents_path, depth, text, due_date, start_date, assigned_to_contact_id, assigned_on, assigned_by_id, time_estimate, completed_on, completed_by_id, started_on, started_by_id, priority, state, milestone_id, is_template, from_template_id, from_template_object_id, repeat_end, repeat_forever, repeat_num, repeat_d, repeat_m, repeat_y, repeat_by, object_subtype, percent_completed, use_due_time, use_start_time, original_task_id, instantiation_id, type_content, total_worked_time) VALUES ('".$jids."', '0', '', '0', 'Deskripsi dari Tugas ".$nama_task."', '".$date_ts."', '".$date_ts."', '".$idkapush."', '".$date_wrk."', '".$id_usef."', '0', '', '0', '', '0', '200', '0', '0', '0', '0', '0', '', '0', '0', '0', '0', '0', '', '0', '0', '0', '0', '0', '0', 'html', '0')");
+	            
+	        $this->eoffice->query("INSERT INTO fo_searchable_objects (rel_object_id, column_name, content, contact_id) VALUES ('".$jids."', 'text', 'Deskripsi dari Tugas ".$nama_task."', 0), ('".$jids."', 'name', '".$nama_task."', 0), ('".$jids."', 'object_id', '".$jids."', 0)");
+	        $object_member = $this->eoffice->query("SELECT * FROM fo_contacts WHERE is_company = '0' ORDER BY object_id ASC")->result();
+	        foreach ($object_member as $key2) {
+	            $permission_group = $this->eoffice->query("SELECT * FROM fo_permission_groups WHERE contact_id = '".$key2->object_id."' ORDER BY contact_id ASC")->row();
+	            $this->eoffice->query("INSERT INTO fo_sharing_table (group_id, object_id) VALUES ('".$permission_group->id."', '".$jids."')");
+	        }
+	        
+	        $this->db->query("INSERT INTO notadinas.master_task VALUES ('".$jidz."','".$rk."','" . $nama_task . "', '', '".$jids."')");
             $a['data'] = $this->db->query("SELECT * FROM notadinas.master_task")->result();
             redirect('admin/manage_task/m_task');
         }
@@ -5406,7 +5407,7 @@ ORDER BY updated_at DESC")->result();
 				INNER JOIN notadinas.master_jabatan as c
 					ON b.id_jabatan = c.id
 				WHERE
-					b.id_jabatan = '$k->id'
+					b.id_jabatan = '$k->jabatan'
 					AND
 					a.tingkatan = 2
 			")->result();
@@ -5426,6 +5427,7 @@ ORDER BY updated_at DESC")->result();
 		}
 		return $tembusan;
 	}
+	
 	
 	function getabx(){
 		$a = 3333.3;

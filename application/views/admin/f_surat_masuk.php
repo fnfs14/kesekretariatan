@@ -884,12 +884,13 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
                                  if($penerima == $c->id){
                                         if($aks == 'AKSI'){
                                           $checked = "checked";
+										$checkSelectedJabatan[$penerima] = $checkTingkatan;
                                         }
 
                                         if($aks == 'INFORMASI'){
                                           $checkeds = "checked";
-                                        }
 										$checkSelectedJabatan[$penerima] = $checkTingkatan;
+                                        }
                                     }
 
                             }
@@ -1135,32 +1136,40 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
         </div>
      </div>
  <?php }
+ $check_getKadis = NULL;
  if($checkJabatan!=NULL){
 	$dispCol = "penerima_disposisi";
 	if($checkJabatan->tingkatan==2){
 		$dispCol = "penerima_disposisi_satuan";								
 	}
-	$checkDisp = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = $idp AND $dispCol = " . $this->session->userdata('admin_jabatan'))->row();
+	 $getSatuan = $this->session->userdata('admin_satuan');
+	 $getJabatan = $this->session->userdata('admin_jabatan');
+	$checkDisp = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = $idp AND $dispCol = $getJabatan")->row();
+	if($getSatuan!="" and $getSatuan!=NULL){		
+		 $getKadis = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE (id = 1 OR id = 28 OR (urutan_view IS NOT NULL AND urutan_view != 0)) AND satuan = $getSatuan AND tingkatan = 1 ORDER BY urutan_view ASC")->row();
+		 $check_getKadis = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = $idp AND $dispCol = $getKadis->id")->row();
+	}
  }
 	if(
 		($act != "kadisp" && $act != "subdisp")
 		or ($checkJabatan!=NULL and $checkJabatan->tingkatan==2)
 		or ($checkJabatan!=NULL and $checkDisp!=NULL and $checkDisp->jenis=='INFORMASI')
-		or (
-			$checkJabatan!=NULL
-			and $checkJabatan->id!=1
-			and $checkJabatan->id!=28
-			and $checkJabatan->id!=$this->session->userdata('admin_jabatan')
-			)
+		// or (
+			// $checkJabatan!=NULL
+			// and $checkJabatan->id!=1
+			// and $checkJabatan->id!=28
+			// and $checkJabatan->id!=$this->session->userdata('admin_jabatan')
+		// )
 		or (
 			$this->session->userdata('admin_tingkatan')==2
 			and (
 				$this->session->userdata('admin_jabatan')==174
 				or $this->session->userdata('admin_jabatan')==84
 				or $this->session->userdata('admin_jabatan')==162
-				)
-			and !isset($checkSelectedJabatan[$this->session->userdata('admin_tingkatan')])
 			)
+			and isset($checkSelectedJabatan[$this->session->userdata('admin_jabatan')])
+			and $check_getKadis->jenis != "AKSI"
+		)
 	){ ?>
         <?php // }else if(isset($InfoOrAksi) and $InfoOrAksi->jenis=="INFORMASI"){ ?>
       <!-- <a class="btn btn-success btn-sm" tabindex="4" id="disposisikan_satuan">Kembali</a> -->
@@ -1801,7 +1810,30 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
 	$(".checkedCheckbox:checked").css('outline','#194896 solid 1px');
 	<?php
 	if(isset($datpil->id_jenis_surat_masuk)){
-		echo "ganti($datpil->id_jenis_surat_masuk)";
-	}
+		// echo "ganti($datpil->id_jenis_surat_masuk)"; 
+             ?>
+		var abcd = $("#jenis_surat").val();
+		// alert(abcd);
+		<?php
+			$selectedAmbilTugas = "";
+			if(isset($datpil->id_taks)){
+				$selectedAmbilTugas = ",selected:".$datpil->id_taks;
+			}
+		?>
+		 $.get('<?php echo base_url().'admin/ambiltugas/' ?>',{ abcd:abcd<?= $selectedAmbilTugas; ?>},function(data){
+              console.log(data);
+              // alert(nofi);
+             $('#listtugas').html(data);
+             
+
+              
+          });
+		  
+		 $.get('<?php echo base_url().'admin/ambilaja/' ?>',{ abcd:abcd},function(data){
+              console.log(data);
+              // alert(nofi);
+             $('#clnya').html(data);
+			 });
+	<?php }
 	?>
 </script>

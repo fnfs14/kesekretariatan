@@ -1,3 +1,4 @@
+<div style="<?=$checkSubdis2;?>">
 <?php if($checkSubdis==""){ ?>
 <div class='page-break'></div>
 <?php } ?>
@@ -220,3 +221,5 @@
 			?>
 
 </table>
+
+</div>
