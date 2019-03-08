@@ -89,10 +89,28 @@ $total_row = 0;
 					<td><?php echo $b->nama_lengkap;?></td>
 					<td><?php echo $b->no_surat."<br><i>".tgl_jam_sql($b->tgl_surat)."</i>"?></td>
 					<td><?php
-						if($b->status_notadinas==4){
-							echo "Diterima tujuan surat";
-						}elseif($b->status_notadinas==5){
-							echo "Selesai";
+						$getKepada = $this->db->query("SELECT nama_jabatan FROM notadinas.master_jabatan WHERE id = $b->kepada")->row()->nama_jabatan;
+						$getTembusan = $this->db->query("
+							SELECT t.status, j.nama_jabatan
+							FROM notadinas.master_jabatan AS j
+							INNER JOIN notadinas.tembusan_nota_dinas as t
+								ON j.id = t.id_jabatan
+							WHERE t.id_notadinas = $b->id
+						")->result();
+						
+						echo "<b>".$getKepada . "</b> : ";
+						if($b->status_tujuan!=1){
+							echo "<i class='fa fa-circle-o' aria-hidden='true' style='color: green !important;'></i> <i class='fa fa-circle' aria-hidden='true' style='color: red !important'></i><br>";
+						}else{
+							echo "<i class='fa fa-circle' aria-hidden='true' style='color: green !important;'></i> <i class='fa fa-circle-o' aria-hidden='true' style='color: red !important'></i><br>";
+						}
+						foreach($getTembusan as $t){							
+							echo "<b>".$t->nama_jabatan . "</b> : ";
+							if($t->status==1){
+								echo "<i class='fa fa-circle-o' aria-hidden='true' style='color: green !important;'></i> <i class='fa fa-circle' aria-hidden='true' style='color: red !important'></i><br>";
+							}else{
+								echo "<i class='fa fa-circle' aria-hidden='true' style='color: green !important;'></i> <i class='fa fa-circle-o' aria-hidden='true' style='color: red !important'></i><br>";
+							}
 						}
 					?>
 					</td>
