@@ -55,9 +55,11 @@
 							$checkedInfo = "checked";
 						}
 					}
-					if($c->tingkatan==2 and $c->tingkatan != $jabatan->tingkatan){
-						$checkedAksi = "";
-						$checkedInfo = "";
+					$checkJabatan = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE id = $jabatan->id")->row();
+					$checkJabatanZ = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE id = $c->id")->row();
+					if(($checkJabatanZ->tingkatan==2 and $checkJabatanZ->tingkatan != $checkJabatan->tingkatan) and $checkJabatan->id!=1 and $checkJabatan->id!=28){
+						$checked = "";
+						$checkeds = "";
 					}
 					echo '
 						<td class="first">

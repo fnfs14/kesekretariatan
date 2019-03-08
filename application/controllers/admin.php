@@ -738,7 +738,9 @@ ORDER BY updated_at DESC")->result();
 		
 		$checkSubdis = "";
 		$checkSubdis2 = "";
+		$_col = "penerima_disposisi";
 		if($this->session->userdata('admin_tingkatan')==2){			
+			$_col = "penerima_disposisi_satuan";
 			$checkSubdisQ = $this->cetakCondition($this->session->userdata('admin_satuan'),$idb);
 			if(
 				isset($checkSubdisQ[$this->session->userdata('admin_jabatan')])
@@ -753,6 +755,14 @@ ORDER BY updated_at DESC")->result();
 		$disp['aksi'] = $this->db->query('SELECT * FROM notadinas.master_aksi ORDER BY id ASC')->result();
 		$disp['idbut'] = $idb;
 		$this->load->view('admin/cetak/surat_masuk_disp', $disp);
+		
+		$checkJabatan = $this->db->query("
+			SELECT *
+			FROM notadinas.disposisi_surat_masuk
+			WHERE
+				id_surat_masuk = $idb
+				AND $_col = " . $this->session->userdata('admin_jabatan')
+		)->row();
 		if(
 			$a['jabatan']->tingkatan!=2 and
 			$this->session->userdata('admin_jabatan') != 1 and
@@ -797,7 +807,7 @@ ORDER BY updated_at DESC")->result();
 					id_jab ASC,
 					urut_subjab ASC
 				")->result();
-			if($kadisp['alamat_aksi_sub'] == NULL){
+			if($kadisp['alamat_aksi_sub'] == NULL or $checkJabatan->jenis=='INFORMASI'){
 				$kadisp['checkSubdis2'] = "display: none;";
 			}
 			$this->load->view('admin/cetak/surat_masuk_kadisp', $kadisp);
