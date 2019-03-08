@@ -558,8 +558,15 @@ if ($mode == "edt" || $mode == "act_edt") {
                             
                             $checked = "";
                             $checkeds = "";
+							
+							$checkTingkatan = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE id = $c->id")->row()->tingkatan;
+							
+							$_zCol = "penerima_disposisi";
+							if($checkTingkatan==2){
+								$_zCol = "penerima_disposisi_satuan";								
+							}
 
-                            $keysp = $this->db->query('SELECT * FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = '.$idp.' AND penerima_disposisi ='.$c->id)->result();
+                            $keysp = $this->db->query('SELECT * FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = '.$idp.' AND $_zCol ='.$c->id)->result();
 
                             $penerima = array();
                             $aks = array();
