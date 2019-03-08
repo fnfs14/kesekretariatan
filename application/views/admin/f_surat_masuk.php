@@ -1568,6 +1568,7 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
 
             $('#pesan_feedback').val('');
             $('.media').load('<?= base_URL()."admin/surat_masuk/kadisp/"  ?>'+ids+' .media');
+			console.log(data);
         });
     });
 

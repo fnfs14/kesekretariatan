@@ -134,6 +134,14 @@ class Administrator extends CI_Controller {
 				$array[$key->penerima_disposisi] = true;
             }
          } 
+		 $atasaan = [1,2,28];
+		 foreach($atasaan as $a){
+			 if(!isset($array[$a])){
+				$this->db->query("INSERT INTO notadinas.feedback_surat_masuk (id_surat_masuk,pengirim,pesan_feedback,created_at,waktu,baca,penerima) VALUES ($id,$pengirim,'$pesan','NOW()','$time', '1','".$a."')");
+				$array[$a] = true;
+			 }
+		 }
+		 echo json_encode($array);
     }
 
     public function feedback_satuan()

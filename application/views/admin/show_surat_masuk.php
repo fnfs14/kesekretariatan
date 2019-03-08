@@ -566,7 +566,7 @@ if ($mode == "edt" || $mode == "act_edt") {
 								$_zCol = "penerima_disposisi_satuan";								
 							}
 
-                            $keysp = $this->db->query('SELECT * FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = '.$idp.' AND $_zCol ='.$c->id)->result();
+                            $keysp = $this->db->query('SELECT * FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = '.$idp.' AND '.$_zCol.' ='.$c->id)->result();
 
                             $penerima = array();
                             $aks = array();
