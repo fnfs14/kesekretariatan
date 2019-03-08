@@ -940,6 +940,11 @@ ORDER BY updated_at DESC")->result();
             $this->db->query("UPDATE notadinas.surat_masuk SET id_workspace = 0, id_taks = '".$_GET['task']."' WHERE id = ".$_GET['id']);
 			die();
         }else if ($mau_ke == "del") {
+			$data = $this->db->query("SELECT file_attachment FROM notadinas.surat_masuk WHERE id = '$idu'")->row()->file_attachment;
+			$file = "./upload/surat_masuk/$data";
+			if (file_exists($file)){
+				unlink($file);
+			}
             $this->db->query("DELETE FROM notadinas.log_proses_surat_masuk WHERE id_suratmasuk = '$idu'");//ubah surat masuk mei
             $this->db->query("DELETE FROM notadinas.surat_masuk WHERE id = '$idu'");
             $this->session->set_flashdata("k", "<div class=\"alert alert-success\" id=\"alert\">Data has been deleted </div>");

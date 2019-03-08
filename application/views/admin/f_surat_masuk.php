@@ -699,23 +699,24 @@ if ($mode == "edt" || $mode == "act_edt") {
             <?php } ?>
             <script>
                 $("#generate_no").click(function () {
-                    // alert(document.getElementById("filenya").files[0].name);
-                    // $.ajax({
-                        // method: 'post',
-                        // url: "<?php echo base_url(); ?>admin/generate_filename?q=2",
-                        // success: function (result) {
-                            // var a = new Date();
-                            // $("#no_lampiran").attr("value", "SM-" + result + "-" + a.getFullYear());
-                            // $("#cetak_no_lampiran").attr("href", "<?php echo base_URL(); ?>admin/cetak_no_lampiran/SM-" + result + "-" + a.getFullYear());
-                        // },
-                        // error: function () {
-                            // alert("Terjadi Kesalahan");
-                        // }
-
-                    // });			
-					var replace = $("input[name='no_setum']").val().replace(".", "") + "_001";//ubah mei surmas8
-					$("#no_lampiran").attr("value", replace);
-					$("#cetak_no_lampiran").attr("href", "<?php echo base_URL(); ?>admin/cetak_no_lampiran_sm/" + $("input[name='no_lampiran']").val());//ubah mei surmas8
+					var file = $("input[name='no_setum']").val().replace(".", "");
+					var string = $("#file_attachment_id").val().replace(/C:\\fakepath\\/i, '');
+                    $.ajax({
+                        method: 'post',
+                        url: "<?php echo base_url(); ?>admin/checkUploadedFile",
+						data:{
+							file : file,
+							ext : string.split(".")[1],
+							path : "<?= base_url(); ?>upload/surat_masuk/"
+						},
+                        success: function (result) {
+							$("#no_lampiran").attr("value", result);
+							$("#cetak_no_lampiran").attr("href", "<?php echo base_URL(); ?>admin/cetak_no_lampiran_sm/" + $("input[name='no_lampiran']").val());
+                        },
+                        error: function () {
+                            alert("Terjadi Kesalahan");
+                        }
+                    });
                 });
 
                 /*
