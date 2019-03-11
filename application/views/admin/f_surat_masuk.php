@@ -1049,7 +1049,7 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
 
   
     <?php if($act != "subdisp" or $checkJabatan->tingkatan==2){ ?>
-     <div class="row-fluid well" style="overflow: hidden">
+     <div class="row-fluid well feedbackDispKapush" style="overflow: hidden">
         <div class="navbar navbar-inverse">
             <div class="container z0">
                 <div class="navbar-header">
@@ -1175,6 +1175,13 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
         <?php // }else if(isset($InfoOrAksi) and $InfoOrAksi->jenis=="INFORMASI"){ ?>
       <!-- <a class="btn btn-success btn-sm" tabindex="4" id="disposisikan_satuan">Kembali</a> -->
         <?php }  else { ?><!--ubah surat masuk mei-->
+		
+		<?php if($this->session->userdata('admin_tingkatan')==2){ ?>
+			<script>
+				$(".feedbackDispKapush").css('display', 'none');
+			</script>
+		<?php } ?>
+		
       <div class="row-fluid well" style="overflow: hidden">
         <div class="navbar navbar-inverse">
             <div class="container z0">

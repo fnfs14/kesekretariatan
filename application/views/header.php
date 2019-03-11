@@ -973,7 +973,9 @@ function baca(e,j) {
 }
 function bacasatuan(e,j) {
 	$.get('<?= base_url()."administrator/baca_feedback_satuan" ?>',{id:e},function (data) {
-		window.location.assign("<?php echo base_url();?>admin/surat_masuk/"+j+"/"+e);
+		$.get('<?= base_url()."administrator/baca_feedback_kadis" ?>',{id:e},function (data) {
+			window.location.assign("<?php echo base_url();?>admin/surat_masuk/"+j+"/"+e);
+		})
 	})
 }
 function bacaKadis(e,j) {
