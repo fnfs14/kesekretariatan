@@ -1048,7 +1048,34 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
     </div>
 
   
-    <?php if($act != "subdisp" or $checkJabatan->tingkatan==2){ ?>
+    <?php 
+	$feedbackDisp = [];
+	$feedbackDisp['jabatan'] = $this->session->userdata('admin_jabatan');
+	if(
+		$act == 'subdisp'
+		and $checkJabatan!=NULL
+		and $checkJabatan->tingkatan!=2
+		and (
+			$feedbackDisp['jabatan'] == 174
+			or $feedbackDisp['jabatan'] == 83
+			or $feedbackDisp['jabatan'] == 84
+		)
+	){
+		$dispCol = "penerima_disposisi";
+		if($checkJabatan->tingkatan==2){
+			$dispCol = "penerima_disposisi_satuan";								
+		}
+		$getSatuan = $this->session->userdata('admin_satuan');
+		$feedbackDisp['getKadis'] = $this->db->query("SELECT * FROM notadinas.master_jabatan WHERE (id = 1 OR id = 28 OR (urutan_view IS NOT NULL AND urutan_view != 0)) AND satuan = $getSatuan AND tingkatan = 1 ORDER BY urutan_view ASC")->row()->id;
+		 $feedbackDisp['result'] = $this->db->query("SELECT * FROM notadinas.disposisi_surat_masuk WHERE id_surat_masuk = $idp AND $dispCol = $feedbackDisp[getKadis]")->row();
+	}
+	if(
+		(
+			isset($feedbackDisp['result'])
+			and $feedbackDisp['result'] = 'INFORMASI'
+		)
+		or $act != "subdisp"
+		or $checkJabatan->tingkatan==2){ ?>
      <div class="row-fluid well feedbackDispKapush" style="overflow: hidden">
         <div class="navbar navbar-inverse">
             <div class="container z0">
