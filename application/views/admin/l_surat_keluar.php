@@ -28,7 +28,7 @@
 				or (
 					$this->session->userdata('admin_jabatan') == 174
 					or $this->session->userdata('admin_jabatan') == 84
-					or $this->session->userdata('admin_jabatan') == 162
+					or $this->session->userdata('admin_jabatan') == 83
 				)
 			){ ?>
 				<li><a href="<?php echo base_URL(); ?>admin/surat_keluar/add" class="btn-info"><i class="icon-plus-sign icon-white"> </i> Tambah Data</a></li>

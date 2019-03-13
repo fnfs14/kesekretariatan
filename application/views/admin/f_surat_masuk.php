@@ -1166,7 +1166,7 @@ if ($this->session->userdata('admin_jabatan') == "28" && $act == "view" || $this
 			and (
 				$this->session->userdata('admin_jabatan')==174
 				or $this->session->userdata('admin_jabatan')==84
-				or $this->session->userdata('admin_jabatan')==162
+				or $this->session->userdata('admin_jabatan')==83
 			)
 			and isset($checkSelectedJabatan[$this->session->userdata('admin_jabatan')])
 			and $check_getKadis->jenis != "AKSI"
