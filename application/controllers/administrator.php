@@ -197,20 +197,23 @@ class Administrator extends CI_Controller {
         $date = date('Y-m-d');
         $pengirim = $this->session->userdata('admin_jabatan');
 		$penerima = [];
+		$penerima[] = 1;
+		$penerima[] = 2;
+		$penerima[] = 28;
 		$tembusan = $this->db->query("
-			SELECT id_jabatan as id
+			SELECT id_jabatan as idz
 			FROM notadinas.tembusan_nota_dinas
 			WHERE
 				id_notadinas = $id
 				AND id_jabatan != $pengirim
 			UNION
-			SELECT kepada as id
+			SELECT kepada as idz
 			FROM notadinas.nota_dinas
 			WHERE
 				id = $id
 				AND kepada != $pengirim
 			UNION
-			SELECT mu.jabatan as id
+			SELECT mu.jabatan as idz
 			FROM notadinas.nota_dinas as nd
 			INNER JOIN notadinas.master_user as mu
 				ON nd.create_by = mu.id
@@ -219,11 +222,21 @@ class Administrator extends CI_Controller {
 				AND mu.jabatan != $pengirim
 		")->result();
 		foreach($tembusan as $t){
-			$penerima[] = $t->id;
+			if(in_array($t->idz, $penerima)){
+			}else{
+				$penerima[] = $t->idz;
+			}
 		}
-		$this->db->query("INSERT INTO notadinas.feedback_nota_dinas (id_nota_dinas,pengirim,pesan_feedback,created_at,waktu,penerima,baca) VALUES ($id,$pengirim,'$pesan','$date','$time',$pengirim,1)");
+		if(in_array($pengirim, $penerima)){
+		}else{
+			$penerima[] = $pengirim;
+		}
 		foreach($penerima as $p){
-			$this->db->query("INSERT INTO notadinas.feedback_nota_dinas (id_nota_dinas,pengirim,pesan_feedback,created_at,waktu,penerima) VALUES ($id,$pengirim,'$pesan','$date','$time','".$p."')");
+			if($pengirim!=$p){				
+				$this->db->query("INSERT INTO notadinas.feedback_nota_dinas (id_nota_dinas,pengirim,pesan_feedback,created_at,waktu,penerima) VALUES ($id,$pengirim,'$pesan','$date','$time','".$p."')");
+			}else{
+				$this->db->query("INSERT INTO notadinas.feedback_nota_dinas (id_nota_dinas,pengirim,pesan_feedback,created_at,waktu,penerima,baca) VALUES ($id,$pengirim,'$pesan','$date','$time',$pengirim,1)");
+			}
 		}
     }
 

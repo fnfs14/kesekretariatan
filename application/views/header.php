@@ -532,10 +532,6 @@
 	          <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes"><i class="icon-list-alt icon-white"> </i> Surat Antar Satker <span class="caret"></span></a>
 	          <ul class="dropdown-menu" aria-labelledby="themes">
 	            <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/nota_dinas/nota_dinas">Pembuatan Surat</a></li>
-	            <?php if($this->session->userdata('admin_jabatan') == 1 || $this->session->userdata('admin_jabatan') == 28) { ?>
-	            <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/manage_ruangkrj/m_ruangkrj">Pengaturan Ruang Kerja</a></li>
-	            <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/manage_task/m_task">Pengaturan Tugas</a></li><!--ubah mei bahasa-->
-	           <?php } ?>
 	            <?php if($this->session->userdata('admin_jabatan') == 2 ) { ?>
 				<li><a tabindex="-1" href="<?php echo base_url(); ?>admin/manage_ruangkrj/m_ruangkrj">Pengaturan Ruang Kerja</a></li>
 	            <li><a tabindex="-1" href="<?php echo base_url(); ?>admin/manage_task/m_task">Pengaturan Tugas</a></li>
